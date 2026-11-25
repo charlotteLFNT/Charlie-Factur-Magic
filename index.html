@@ -107,10 +107,10 @@
   <div id="tab-or" class="tab-content active">
     <div class="scan-box" onclick="document.getElementById('fileOR').click()">
       <span>📋</span>
-      <strong>Prendre en photo un OR</strong>
-      <div style="font-size:0.82rem; color:var(--muted); margin-top:4px;">Appareil photo ou galerie</div>
+      <strong>Scanner ou importer un OR</strong>
+      <div style="font-size:0.82rem; color:var(--muted); margin-top:4px;">Appareil photo, Scan document ou Galerie</div>
     </div>
-    <input type="file" id="fileOR" accept="image/*" capture="environment" onchange="handleORFile(this)">
+    <input type="file" id="fileOR" accept="image/*" onchange="handleORFile(this)">
 
     <div id="loaderOR" class="loader">🪄 Lecture et mise en forme de l'OR en cours...</div>
 
@@ -137,9 +137,9 @@
     <div class="scan-box" onclick="document.getElementById('filePieces').click()">
       <span>🔩</span>
       <strong>Scanner un BL / Facture Pièces</strong>
-      <div style="font-size:0.82rem; color:var(--muted); margin-top:4px;">Appareil photo ou galerie</div>
+      <div style="font-size:0.82rem; color:var(--muted); margin-top:4px;">Appareil photo, Scan document ou Galerie</div>
     </div>
-    <input type="file" id="filePieces" accept="image/*" capture="environment" onchange="handlePiecesFile(this)">
+    <input type="file" id="filePieces" accept="image/*" onchange="handlePiecesFile(this)">
 
     <div id="loaderPieces" class="loader">🔍 Extraction des références et prix en cours...</div>
 
@@ -198,21 +198,24 @@
     document.getElementById("nav-" + tab).classList.add("active");
   }
 
+  // Compression + éclaircissement et contraste automatiques pour documents sombres
   function compressImage(file, callback) {
     const reader = new FileReader();
     reader.onload = function(e) {
       const img = new Image();
       img.onload = function() {
         const canvas = document.createElement("canvas");
-        const maxDim = 1600;
+        const maxDim = 1800;
         let w = img.width, h = img.height;
         if (w > maxDim || h > maxDim) {
           if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
           else { w = Math.round(w * maxDim / h); h = maxDim; }
         }
         canvas.width = w; canvas.height = h;
-        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+        const ctx = canvas.getContext("2d");
+        ctx.filter = "brightness(115%) contrast(120%)";
+        ctx.drawImage(img, 0, 0, w, h);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
         callback(dataUrl.split(",")[1], "image/jpeg");
       };
       img.src = e.target.result;
