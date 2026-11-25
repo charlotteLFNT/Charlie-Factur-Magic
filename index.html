@@ -11,7 +11,7 @@
   <style>
     :root {
       --bg: #0f2933; --card: #163845; --accent: #f5b027;
-      --text: #ffffff; --muted: #9ec0cc; --alert: #e65100; --ok: #2e7d32;
+      --text: #ffffff; --muted: #9ec0cc; --alert: #e65100; --ok: #2e7d32; --danger: #c62828;
     }
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 85px; }
@@ -54,6 +54,7 @@
     input[type="file"] { display: none; }
 
     .card { background: var(--card); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+    .card-title { font-size: 0.9rem; font-weight: 700; color: var(--accent); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     label { display: block; font-size: 0.78rem; color: var(--muted); margin: 8px 0 4px; font-weight: 600; }
     input[type="text"], input[type="number"], textarea {
       width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2b5869;
@@ -68,6 +69,20 @@
     }
     .btn-primary { background: var(--accent); color: #0a1d24; }
     .btn-secondary { background: #265363; color: #fff; }
+
+    /* Liste des OR archivés */
+    .or-list-item {
+      background: #0c222b; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      border-left: 3px solid var(--accent);
+    }
+    .or-list-info { flex: 1; cursor: pointer; }
+    .or-list-info .top-line { font-weight: 700; font-size: 0.92rem; color: #fff; }
+    .or-list-info .sub-line { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .btn-del {
+      background: var(--danger); color: #fff; border: none; border-radius: 8px;
+      padding: 7px 11px; font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
 
     .piece-item {
       background: #0c222b; padding: 10px; border-radius: 10px; margin-bottom: 8px;
@@ -126,6 +141,7 @@
 
     <div id="loaderOR" class="loader">🪄 Lecture et mise en forme de l'OR en cours...</div>
 
+    <!-- Fiche OR active (après scan ou clic dans la liste) -->
     <div id="resultOR" class="card" style="display:none;">
       <div class="row2">
         <div><label>Date travaux</label><input type="text" id="orDate"></div>
@@ -141,7 +157,16 @@
       <input type="hidden" id="orTexteBrut">
 
       <button class="btn btn-primary" onclick="copyORText()">📋 Copier le texte pour Pennylane</button>
-      <button class="btn btn-secondary" onclick="saveORToSheet()">💾 Archiver dans Historique_OR</button>
+      <button class="btn btn-secondary" id="btnSaveOR" onclick="saveORToSheet()">💾 Archiver dans Historique_OR</button>
+    </div>
+
+    <!-- Liste des OR archivés synchronisés -->
+    <div id="archivedORCard" class="card" style="display:none;">
+      <div class="card-title">
+        <span>📂 OR archivés à facturer</span>
+        <span style="font-size:0.75rem; color:var(--muted); font-weight:normal;">Toucher pour ouvrir</span>
+      </div>
+      <div id="archivedORList"></div>
     </div>
   </div>
 
@@ -181,6 +206,7 @@
 
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbxJQLBw5f5v_1HlM5dC7bdPsBykRfbjPslnpLl3PfEFKp_9P7g1ZxnN3LRsT8WZpJvXjg/exec";
+  let currentArchivedORs = [];
 
   async function callApi(payload) {
     const res = await fetch(API_URL, {
@@ -198,17 +224,63 @@
   async function refreshStatus() {
     try {
       const status = await callApi({ action: "getStatus" });
-      updateBanner(status);
+      updateUI(status);
     } catch (e) { console.error(e); }
   }
 
-  function updateBanner(status) {
+  function updateUI(status) {
+    if (!status) return;
     const banner = document.getElementById("alertBanner");
-    if (status && status.pendingCount > 0) {
+    if (status.pendingCount > 0) {
       document.getElementById("pendingCount").innerText = status.pendingCount;
       banner.style.display = "block";
     } else {
       banner.style.display = "none";
+    }
+
+    currentArchivedORs = status.archivedORs || [];
+    const card = document.getElementById("archivedORCard");
+    const list = document.getElementById("archivedORList");
+    if (currentArchivedORs.length > 0) {
+      list.innerHTML = "";
+      currentArchivedORs.forEach((or, index) => {
+        list.innerHTML += `
+          <div class="or-list-item">
+            <div class="or-list-info" onclick="openArchivedOR(${index})">
+              <div class="top-line">${or.date ? or.date + " — " : ""}${or.client}</div>
+              <div class="sub-line">${or.engin || "Matériel non précisé"}${or.heures_mo ? " • " + or.heures_mo + "h MO" : ""}</div>
+            </div>
+            <button class="btn-del" onclick="removeArchivedOR(${or.row})">Effacer</button>
+          </div>`;
+      });
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+  }
+
+  function openArchivedOR(index) {
+    const or = currentArchivedORs[index];
+    if (!or) return;
+    document.getElementById("orDate").value = or.date || "";
+    document.getElementById("orClient").value = or.client || "";
+    document.getElementById("orEngin").value = or.engin || "";
+    document.getElementById("orHeuresEngin").value = or.heures_engin || "";
+    document.getElementById("orHeuresMO").value = or.heures_mo || "";
+    document.getElementById("orTextePropre").value = or.texte_facture || "";
+    document.getElementById("orTexteBrut").value = or.texte_brut || "";
+    document.getElementById("btnSaveOR").style.display = "none";
+    document.getElementById("resultOR").style.display = "block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function removeArchivedOR(row) {
+    if (!confirm("Effacer cet OR de la liste ?")) return;
+    try {
+      const res = await callApi({ action: "deleteOR", row: row });
+      updateUI(res.status);
+    } catch (err) {
+      alert("Erreur : " + err.message);
     }
   }
 
@@ -258,6 +330,7 @@
         document.getElementById("orHeuresMO").value = res.heures_mo || "";
         document.getElementById("orTextePropre").value = res.texte_facture || "";
         document.getElementById("orTexteBrut").value = res.texte_brut || "";
+        document.getElementById("btnSaveOR").style.display = "block";
         document.getElementById("resultOR").style.display = "block";
       } catch (err) {
         alert("Erreur : " + err.message);
@@ -283,7 +356,7 @@
 
   async function saveORToSheet() {
     try {
-      await callApi({
+      const res = await callApi({
         action: "saveOR",
         data: {
           date_travaux: document.getElementById("orDate").value,
@@ -295,7 +368,8 @@
           texte_brut: document.getElementById("orTexteBrut").value
         }
       });
-      alert("💾 OR archivé dans Historique_OR !");
+      updateUI(res.status);
+      alert("💾 OR archivé et visible sur tous tes appareils !");
     } catch (err) { alert("Erreur : " + err.message); }
   }
 
@@ -347,7 +421,7 @@
       const res = await callApi({ action: "upsertPieces", fournisseur: fournisseur, pieces: items });
       alert(`✅ Base mise à jour !\n• Nouvelles : ${res.created}\n• Prix modifiés : ${res.updated}\n• Inchangées : ${res.unchanged}`);
       document.getElementById("resultPieces").style.display = "none";
-      updateBanner(res.status);
+      updateUI(res.status);
     } catch (err) { alert("Erreur : " + err.message); }
   }
 
