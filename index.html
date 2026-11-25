@@ -42,12 +42,15 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
+    .scan-grid { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 10px; margin-bottom: 14px; }
     .scan-box {
       background: var(--card); border: 2px dashed var(--accent); border-radius: 16px;
-      padding: 24px 16px; text-align: center; cursor: pointer; margin-bottom: 14px;
+      padding: 20px 10px; text-align: center; cursor: pointer;
     }
-    .scan-box span { font-size: 2.2rem; display: block; margin-bottom: 6px; }
-    .scan-box strong { color: var(--accent); font-size: 1.05rem; }
+    .scan-box.alt { border-style: solid; border-color: #2b5869; }
+    .scan-box span { font-size: 2rem; display: block; margin-bottom: 6px; }
+    .scan-box strong { color: var(--accent); font-size: 0.95rem; display: block; }
+    .scan-box.alt strong { color: #fff; }
     input[type="file"] { display: none; }
 
     .card { background: var(--card); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
@@ -104,13 +107,22 @@
 <div id="exportResult"></div>
 
 <div class="container">
+  <!-- ONGLET 1 : OR -->
   <div id="tab-or" class="tab-content active">
-    <div class="scan-box" onclick="document.getElementById('fileOR').click()">
-      <span>📋</span>
-      <strong>Scanner ou importer un OR</strong>
-      <div style="font-size:0.82rem; color:var(--muted); margin-top:4px;">Appareil photo, Scan document ou Galerie</div>
+    <div class="scan-grid">
+      <div class="scan-box" onclick="document.getElementById('camOR').click()">
+        <span>📷</span>
+        <strong>Photo OR</strong>
+        <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Appareil photo</div>
+      </div>
+      <div class="scan-box alt" onclick="document.getElementById('galOR').click()">
+        <span>🖼️</span>
+        <strong>Galerie</strong>
+        <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Fichier / Scan</div>
+      </div>
     </div>
-    <input type="file" id="fileOR" accept="image/*" onchange="handleORFile(this)">
+    <input type="file" id="camOR" accept="image/*" capture="environment" onchange="handleORFile(this)">
+    <input type="file" id="galOR" accept="image/*" onchange="handleORFile(this)">
 
     <div id="loaderOR" class="loader">🪄 Lecture et mise en forme de l'OR en cours...</div>
 
@@ -133,13 +145,22 @@
     </div>
   </div>
 
+  <!-- ONGLET 2 : PIECES -->
   <div id="tab-pieces" class="tab-content">
-    <div class="scan-box" onclick="document.getElementById('filePieces').click()">
-      <span>🔩</span>
-      <strong>Scanner un BL / Facture Pièces</strong>
-      <div style="font-size:0.82rem; color:var(--muted); margin-top:4px;">Appareil photo, Scan document ou Galerie</div>
+    <div class="scan-grid">
+      <div class="scan-box" onclick="document.getElementById('camPieces').click()">
+        <span>📷</span>
+        <strong>Photo BL / Facture</strong>
+        <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Appareil photo</div>
+      </div>
+      <div class="scan-box alt" onclick="document.getElementById('galPieces').click()">
+        <span>🖼️</span>
+        <strong>Galerie</strong>
+        <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Fichier / Scan</div>
+      </div>
     </div>
-    <input type="file" id="filePieces" accept="image/*" onchange="handlePiecesFile(this)">
+    <input type="file" id="camPieces" accept="image/*" capture="environment" onchange="handlePiecesFile(this)">
+    <input type="file" id="galPieces" accept="image/*" onchange="handlePiecesFile(this)">
 
     <div id="loaderPieces" class="loader">🔍 Extraction des références et prix en cours...</div>
 
@@ -198,7 +219,6 @@
     document.getElementById("nav-" + tab).classList.add("active");
   }
 
-  // Compression + éclaircissement et contraste automatiques pour documents sombres
   function compressImage(file, callback) {
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -243,6 +263,7 @@
         alert("Erreur : " + err.message);
       } finally {
         document.getElementById("loaderOR").style.display = "none";
+        input.value = "";
       }
     });
   }
@@ -306,6 +327,7 @@
         alert("Erreur : " + err.message);
       } finally {
         document.getElementById("loaderPieces").style.display = "none";
+        input.value = "";
       }
     });
   }
