@@ -7,9 +7,9 @@
   "theme_color": "#0f2933",
   "icons": [
     {
-      "src": "./logo.png",
+      "src": "./Logo Charlie Factur'Magic.jpg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpeg"
     }
   ]
 }
