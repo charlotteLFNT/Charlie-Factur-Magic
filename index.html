@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#0f2933">
+  <title>Charlie Factur'Magic</title>
+  <link rel="icon" type="image/png" href="./logo.png">
+  <link rel="apple-touch-icon" href="./logo.png">
+  <link rel="manifest" href="./manifest.json">
+  <style>
+    :root {
+      --bg: #0f2933; --card: #163845; --accent: #f5b027;
+      --text: #ffffff; --muted: #9ec0cc; --alert: #e65100; --ok: #2e7d32;
+    }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 85px; }
+    header { background: #0a1d24; padding: 14px 16px; text-align: center; border-bottom: 2px solid var(--accent); }
+    header img { width: 58px; height: 58px; border-radius: 14px; border: 2px solid var(--accent); margin-bottom: 4px; object-fit: cover; }
+    header h1 { margin: 0; font-size: 1.25rem; color: var(--accent); letter-spacing: 0.5px; }
+    header p { margin: 2px 0 0; font-size: 0.78rem; color: var(--muted); }
+
+    #alertBanner {
+      display: none; background: var(--alert); color: #fff; padding: 12px 14px;
+      margin: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    #alertBanner .top { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.92rem; }
+    #alertBanner button {
+      margin-top: 8px; width: 100%; background: #fff; color: var(--alert); border: none;
+      padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+    }
+    #exportResult {
+      display: none; background: var(--ok); color: #fff; padding: 12px; margin: 12px;
+      border-radius: 12px; text-align: center; font-size: 0.9rem;
+    }
+    #exportResult a {
+      display: inline-block; margin-top: 8px; background: #fff; color: var(--ok);
+      padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: 700;
+    }
+
+    .container { padding: 12px; max-width: 600px; margin: auto; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .scan-box {
+      background: var(--card); border: 2px dashed var(--accent); border-radius: 16px;
+      padding: 24px 16px; text-align: center; cursor: pointer; margin-bottom: 14px;
+    }
+    .scan-box span { font-size: 2.2rem; display: block; margin-bottom: 6px; }
+    .scan-box strong { color: var(--accent); font-size: 1.05rem; }
+    input[type="file"] { display: none; }
+
+    .card { background: var(--card); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+    label { display: block; font-size: 0.78rem; color: var(--muted); margin: 8px 0 4px; font-weight: 600; }
+    input[type="text"], input[type="number"], textarea {
+      width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2b5869;
+      background: #0c222b; color: #fff; font-size: 0.95rem;
+    }
+    textarea { min-height: 120px; line-height: 1.4; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .btn {
+      width: 100%; padding: 13px; border: none; border-radius: 10px; font-weight: 700;
+      font-size: 0.98rem; cursor: pointer; margin-top: 10px;
+    }
+    .btn-primary { background: var(--accent); color: #0a1d24; }
+    .btn-secondary { background: #265363; color: #fff; }
+
+    .piece-item {
+      background: #0c222b; padding: 10px; border-radius: 10px; margin-bottom: 8px;
+      border-left: 3px solid var(--accent);
+    }
+    .piece-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 6px; margin-top: 6px; }
+
+    .loader { display: none; text-align: center; padding: 20px; color: var(--accent); font-weight: 600; }
+
+    nav {
+      position: fixed; bottom: 0; left: 0; right: 0; background: #0a1d24;
+      display: flex; border-top: 1px solid #244b59; height: 68px;
+    }
+    nav button {
+      flex: 1; background: none; border: none; color: var(--muted); font-size: 0.85rem;
+      font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    }
+    nav button.active { color: var(--accent); background: rgba(245, 176, 39, 0.08); }
+    nav button span { font-size: 1.3rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="./logo.png" alt="Logo Charlie">
+  <h1>✨ Charlie Factur'Magic</h1>
+  <p>L'assistant magique d'aide à la facturation</p>
+</header>
+
+<div id="alertBanner">
+  <div class="top">
+    <span>⚠️ <span id="pendingCount">0</span> pièce(s) à mettre à jour dans Pennylane</span>
+  </div>
+  <button onclick="triggerPennylaneExport()">📥 Générer le fichier Excel Pennylane</button>
+</div>
+
+<div id="exportResult"></div>
+
+<div class="container">
+  <div id="tab-or" class="tab-content active">
+    <div class="scan-box" onclick="document.getElementById('fileOR').click()">
+      <span>📋</span>
+      <strong>Prendre en photo un OR</strong>
+      <div style="font-size:0.82rem; color:var(--muted); margin-top:4px;">Appareil photo ou galerie</div>
+    </div>
+    <input type="file" id="fileOR" accept="image/*" capture="environment" onchange="handleORFile(this)">
+
+    <div id="loaderOR" class="loader">🪄 Lecture et mise en forme de l'OR en cours...</div>
+
+    <div id="resultOR" class="card" style="display:none;">
+      <div class="row2">
+        <div><label>Date travaux</label><input type="text" id="orDate"></div>
+        <div><label>Heures à facturer</label><input type="text" id="orHeuresMO"></div>
+      </div>
+      <label>Client</label><input type="text" id="orClient">
+      <div class="row2">
+        <div><label>Engin / Véhicule</label><input type="text" id="orEngin"></div>
+        <div><label>Heures / Km engin</label><input type="text" id="orHeuresEngin"></div>
+      </div>
+      <label>Texte reformulé pour Pennylane</label>
+      <textarea id="orTextePropre"></textarea>
+      <input type="hidden" id="orTexteBrut">
+
+      <button class="btn btn-primary" onclick="copyORText()">📋 Copier le texte pour Pennylane</button>
+      <button class="btn btn-secondary" onclick="saveORToSheet()">💾 Archiver dans Historique_OR</button>
+    </div>
+  </div>
+
+  <div id="tab-pieces" class="tab-content">
+    <div class="scan-box" onclick="document.getElementById('filePieces').click()">
+      <span>🔩</span>
+      <strong>Scanner un BL / Facture Pièces</strong>
+      <div style="font-size:0.82rem; color:var(--muted); margin-top:4px;">Appareil photo ou galerie</div>
+    </div>
+    <input type="file" id="filePieces" accept="image/*" capture="environment" onchange="handlePiecesFile(this)">
+
+    <div id="loaderPieces" class="loader">🔍 Extraction des références et prix en cours...</div>
+
+    <div id="resultPieces" class="card" style="display:none;">
+      <label>Fournisseur détecté</label>
+      <input type="text" id="fournisseurName">
+      <label>Pièces détectées (vérifie avant enregistrement)</label>
+      <div id="piecesListContainer"></div>
+      <button class="btn btn-primary" onclick="savePiecesToBase()">✅ Enregistrer dans Base_Pièces</button>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <button id="nav-or" class="active" onclick="switchTab('or')"><span>📋</span>Ordres de Rép.</button>
+  <button id="nav-pieces" onclick="switchTab('pieces')"><span>🔩</span>Pièces & Prix</button>
+</nav>
+
+<script>
+  const API_URL = "COLLE_ICI_TON_URL_APPS_SCRIPT";
+
+  async function callApi(payload) {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || "Erreur serveur");
+    return json.data;
+  }
+
+  window.onload = refreshStatus;
+
+  async function refreshStatus() {
+    try {
+      const status = await callApi({ action: "getStatus" });
+      updateBanner(status);
+    } catch (e) { console.error(e); }
+  }
+
+  function updateBanner(status) {
+    const banner = document.getElementById("alertBanner");
+    if (status && status.pendingCount > 0) {
+      document.getElementById("pendingCount").innerText = status.pendingCount;
+      banner.style.display = "block";
+    } else {
+      banner.style.display = "none";
+    }
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+    document.querySelectorAll("nav button").forEach(el => el.classList.remove("active"));
+    document.getElementById("tab-" + tab).classList.add("active");
+    document.getElementById("nav-" + tab).classList.add("active");
+  }
+
+  function compressImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement("canvas");
+        const maxDim = 1600;
+        let w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+          else { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+        callback(dataUrl.split(",")[1], "image/jpeg");
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleORFile(input) {
+    if (!input.files[0]) return;
+    document.getElementById("loaderOR").style.display = "block";
+    document.getElementById("resultOR").style.display = "none";
+
+    compressImage(input.files[0], async (b64, mime) => {
+      try {
+        const res = await callApi({ action: "analyzeOR", base64: b64, mimeType: mime });
+        document.getElementById("orDate").value = res.date_travaux || "";
+        document.getElementById("orClient").value = res.client || "";
+        document.getElementById("orEngin").value = res.engin || "";
+        document.getElementById("orHeuresEngin").value = res.heures_engin || "";
+        document.getElementById("orHeuresMO").value = res.heures_mo || "";
+        document.getElementById("orTextePropre").value = res.texte_facture || "";
+        document.getElementById("orTexteBrut").value = res.texte_brut || "";
+        document.getElementById("resultOR").style.display = "block";
+      } catch (err) {
+        alert("Erreur : " + err.message);
+      } finally {
+        document.getElementById("loaderOR").style.display = "none";
+      }
+    });
+  }
+
+  function copyORText() {
+    const header = [
+      document.getElementById("orEngin").value,
+      document.getElementById("orHeuresEngin").value ? "(" + document.getElementById("orHeuresEngin").value + ")" : "",
+      document.getElementById("orDate").value ? "- Intervention du " + document.getElementById("orDate").value : ""
+    ].filter(Boolean).join(" ");
+
+    const fullText = (header ? header + "\n" : "") + document.getElementById("orTextePropre").value;
+    navigator.clipboard.writeText(fullText).then(() => {
+      alert("✅ Texte copié ! Tu peux le coller dans Pennylane.");
+    });
+  }
+
+  async function saveORToSheet() {
+    try {
+      await callApi({
+        action: "saveOR",
+        data: {
+          date_travaux: document.getElementById("orDate").value,
+          client: document.getElementById("orClient").value,
+          engin: document.getElementById("orEngin").value,
+          heures_engin: document.getElementById("orHeuresEngin").value,
+          heures_mo: document.getElementById("orHeuresMO").value,
+          texte_facture: document.getElementById("orTextePropre").value,
+          texte_brut: document.getElementById("orTexteBrut").value
+        }
+      });
+      alert("💾 OR archivé dans Historique_OR !");
+    } catch (err) { alert("Erreur : " + err.message); }
+  }
+
+  function handlePiecesFile(input) {
+    if (!input.files[0]) return;
+    document.getElementById("loaderPieces").style.display = "block";
+    document.getElementById("resultPieces").style.display = "none";
+
+    compressImage(input.files[0], async (b64, mime) => {
+      try {
+        const res = await callApi({ action: "analyzeInvoice", base64: b64, mimeType: mime });
+        document.getElementById("fournisseurName").value = res.fournisseur || "";
+        const container = document.getElementById("piecesListContainer");
+        container.innerHTML = "";
+        (res.pieces || []).forEach(p => {
+          const pv = (Number(p.pa_ht || 0) * 1.8).toFixed(2);
+          container.innerHTML += `
+            <div class="piece-item">
+              <input type="text" class="p-nom" value="${(p.nom || "").replace(/"/g, '&quot;')}" placeholder="Désignation">
+              <div class="piece-grid">
+                <input type="text" class="p-id" value="${(p.id || "").replace(/"/g, '&quot;')}" placeholder="Référence">
+                <input type="number" step="0.01" class="p-pa" value="${p.pa_ht || 0}" oninput="this.parentElement.nextElementSibling.innerText='Vente Pennylane : '+(this.value*1.8).toFixed(2)+' €'">
+              </div>
+              <div style="font-size:0.78rem; color:var(--accent); margin-top:4px;">Vente Pennylane : ${pv} €</div>
+            </div>`;
+        });
+        document.getElementById("resultPieces").style.display = "block";
+      } catch (err) {
+        alert("Erreur : " + err.message);
+      } finally {
+        document.getElementById("loaderPieces").style.display = "none";
+      }
+    });
+  }
+
+  async function savePiecesToBase() {
+    const fournisseur = document.getElementById("fournisseurName").value;
+    const items = [];
+    document.querySelectorAll(".piece-item").forEach(div => {
+      items.push({
+        id: div.querySelector(".p-id").value,
+        nom: div.querySelector(".p-nom").value,
+        pa_ht: parseFloat(div.querySelector(".p-pa").value) || 0,
+        unite: "unité"
+      });
+    });
+    try {
+      const res = await callApi({ action: "upsertPieces", fournisseur: fournisseur, pieces: items });
+      alert(`✅ Base mise à jour !\n• Nouvelles : ${res.created}\n• Prix modifiés : ${res.updated}\n• Inchangées : ${res.unchanged}`);
+      document.getElementById("resultPieces").style.display = "none";
+      updateBanner(res.status);
+    } catch (err) { alert("Erreur : " + err.message); }
+  }
+
+  async function triggerPennylaneExport() {
+    const btn = document.querySelector("#alertBanner button");
+    btn.innerText = "⏳ Génération du fichier Excel en cours...";
+    btn.disabled = true;
+    try {
+      const res = await callApi({ action: "exportPennylane" });
+      refreshStatus();
+      const box = document.getElementById("exportResult");
+      box.innerHTML = `✅ Fichier <b>Export_Pennylane_MAJ.xlsx</b> généré (${res.count} pièce(s)) !<br>
+        <a href="${res.downloadUrl}" target="_blank">⬇️ Télécharger le fichier Excel</a>`;
+      box.style.display = "block";
+    } catch (err) {
+      alert("Erreur : " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "📥 Générer le fichier Excel Pennylane";
+    }
+  }
+</script>
+</body>
+</html>
