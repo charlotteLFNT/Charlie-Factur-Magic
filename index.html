@@ -16,7 +16,6 @@
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 85px; }
 
-    /* En-tête avec la bannière complète */
     header {
       background: #0a1d24; border-bottom: 2px solid var(--accent);
       text-align: center; padding: 0; overflow: hidden;
@@ -26,7 +25,6 @@
       display: block; margin: auto;
     }
 
-    /* Bouton d'installation PWA (disparaît automatiquement une fois installé) */
     #installBanner {
       display: none; background: linear-gradient(135deg, #1b4859, #102e3a);
       border: 1px solid var(--accent); border-radius: 12px; padding: 10px 14px;
@@ -60,7 +58,7 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .scan-grid { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 10px; margin-bottom: 14px; }
+    .scan-grid { display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 10px; margin-bottom: 14px; }
     .scan-box {
       background: var(--card); border: 2px dashed var(--accent); border-radius: 16px;
       padding: 20px 10px; text-align: center; cursor: pointer;
@@ -127,7 +125,6 @@
   <img src="./banniere.jpeg" alt="Charlie Factur'Magic" class="banner">
 </header>
 
-<!-- Bandeau d'installation (disparaît automatiquement dès que l'appli est installée) -->
 <div id="installBanner">
   <span>📲 Installer l'appli sur l'écran d'accueil</span>
   <button id="installBtn">Installer</button>
@@ -152,13 +149,13 @@
         <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Appareil photo</div>
       </div>
       <div class="scan-box alt" onclick="document.getElementById('galOR').click()">
-        <span>🖼️</span>
-        <strong>Galerie</strong>
-        <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Fichier / Scan</div>
+        <span>📄</span>
+        <strong>Fichier / PDF</strong>
+        <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Galerie ou PDF</div>
       </div>
     </div>
     <input type="file" id="camOR" accept="image/*" capture="environment" onchange="handleORFile(this)">
-    <input type="file" id="galOR" accept="image/*" onchange="handleORFile(this)">
+    <input type="file" id="galOR" accept="image/*,application/pdf" onchange="handleORFile(this)">
 
     <div id="loaderOR" class="loader">🪄 Lecture et mise en forme de l'OR en cours...</div>
 
@@ -198,13 +195,13 @@
         <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Appareil photo</div>
       </div>
       <div class="scan-box alt" onclick="document.getElementById('galPieces').click()">
-        <span>🖼️</span>
-        <strong>Galerie</strong>
-        <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Fichier / Scan</div>
+        <span>📄</span>
+        <strong>Fichier / PDF</strong>
+        <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Galerie ou PDF</div>
       </div>
     </div>
     <input type="file" id="camPieces" accept="image/*" capture="environment" onchange="handlePiecesFile(this)">
-    <input type="file" id="galPieces" accept="image/*" onchange="handlePiecesFile(this)">
+    <input type="file" id="galPieces" accept="image/*,application/pdf" onchange="handlePiecesFile(this)">
 
     <div id="loaderPieces" class="loader">🔍 Extraction des références et prix en cours...</div>
 
@@ -228,7 +225,6 @@
   let currentArchivedORs = [];
   let deferredPrompt = null;
 
-  // Enregistrement du Service Worker + gestion du bouton d'installation
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
   }
@@ -341,9 +337,14 @@
     document.getElementById("nav-" + tab).classList.add("active");
   }
 
-  function compressImage(file, callback) {
+  // Prépare le fichier : envoie le PDF tel quel ou compresse/éclaircit l'image
+  function prepareFile(file, callback) {
     const reader = new FileReader();
     reader.onload = function(e) {
+      if (file.type === "application/pdf") {
+        callback(e.target.result.split(",")[1], "application/pdf");
+        return;
+      }
       const img = new Image();
       img.onload = function() {
         const canvas = document.createElement("canvas");
@@ -370,7 +371,7 @@
     document.getElementById("loaderOR").style.display = "block";
     document.getElementById("resultOR").style.display = "none";
 
-    compressImage(input.files[0], async (b64, mime) => {
+    prepareFile(input.files[0], async (b64, mime) => {
       try {
         const res = await callApi({ action: "analyzeOR", base64: b64, mimeType: mime });
         document.getElementById("orDate").value = res.date_travaux || "";
@@ -428,7 +429,7 @@
     document.getElementById("loaderPieces").style.display = "block";
     document.getElementById("resultPieces").style.display = "none";
 
-    compressImage(input.files[0], async (b64, mime) => {
+    prepareFile(input.files[0], async (b64, mime) => {
       try {
         const res = await callApi({ action: "analyzeInvoice", base64: b64, mimeType: mime });
         document.getElementById("fournisseurName").value = res.fournisseur || "";
