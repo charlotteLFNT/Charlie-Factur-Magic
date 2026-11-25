@@ -76,7 +76,9 @@
       width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2b5869;
       background: #0c222b; color: #fff; font-size: 0.95rem;
     }
-    textarea { min-height: 120px; line-height: 1.4; }
+    textarea {
+      min-height: 90px; line-height: 1.45; resize: none; overflow: hidden;
+    }
     .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
     /* Raccourci copier en bout de cellule */
@@ -213,7 +215,7 @@
 
       <label>Texte reformulé pour Pennylane</label>
       <div class="copy-group">
-        <textarea id="orTextePropre"></textarea>
+        <textarea id="orTextePropre" oninput="autoResizeTextarea(this)"></textarea>
         <button type="button" class="btn-copy-cell" title="Copier le détail" onclick="copyField('orTextePropre', this)">📋</button>
       </div>
       <input type="hidden" id="orTexteBrut">
@@ -299,6 +301,13 @@
     deferredPrompt = null;
   });
 
+  // Ajuste automatiquement la hauteur de la zone texte à son contenu complet
+  function autoResizeTextarea(el) {
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = (el.scrollHeight + 4) + "px";
+  }
+
   function copyField(fieldId, btn) {
     const val = document.getElementById(fieldId).value;
     navigator.clipboard.writeText(val).then(() => {
@@ -371,10 +380,12 @@
     document.getElementById("orEngin").value = or.engin || "";
     document.getElementById("orHeuresEngin").value = or.heures_engin || "";
     document.getElementById("orHeuresMO").value = or.heures_mo || "";
-    document.getElementById("orTextePropre").value = or.texte_facture || "";
+    const txtEl = document.getElementById("orTextePropre");
+    txtEl.value = or.texte_facture || "";
     document.getElementById("orTexteBrut").value = or.texte_brut || "";
     document.getElementById("btnSaveOR").style.display = "none";
     document.getElementById("resultOR").style.display = "block";
+    autoResizeTextarea(txtEl);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -436,10 +447,12 @@
         document.getElementById("orEngin").value = res.engin || "";
         document.getElementById("orHeuresEngin").value = res.heures_engin || "";
         document.getElementById("orHeuresMO").value = res.heures_mo || "";
-        document.getElementById("orTextePropre").value = res.texte_facture || "";
+        const txtEl = document.getElementById("orTextePropre");
+        txtEl.value = res.texte_facture || "";
         document.getElementById("orTexteBrut").value = res.texte_brut || "";
         document.getElementById("btnSaveOR").style.display = "block";
         document.getElementById("resultOR").style.display = "block";
+        autoResizeTextarea(txtEl);
       } catch (err) {
         alert("Erreur : " + err.message);
       } finally {
