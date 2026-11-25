@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="theme-color" content="#0f2933">
   <title>Charlie Factur'Magic</title>
-  <link rel="icon" type="image/png" href="./Logo Charlie Factur'Magic.jpg">
+  <link rel="icon" type="image/jpeg" href="./Logo Charlie Factur'Magic.jpg">
   <link rel="apple-touch-icon" href="./Logo Charlie Factur'Magic.jpg">
   <link rel="manifest" href="./manifest.json">
   <style>
@@ -15,10 +15,28 @@
     }
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 85px; }
-    header { background: #0a1d24; padding: 14px 16px; text-align: center; border-bottom: 2px solid var(--accent); }
-    header img { width: 58px; height: 58px; border-radius: 14px; border: 2px solid var(--accent); margin-bottom: 4px; object-fit: cover; }
-    header h1 { margin: 0; font-size: 1.25rem; color: var(--accent); letter-spacing: 0.5px; }
-    header p { margin: 2px 0 0; font-size: 0.78rem; color: var(--muted); }
+
+    /* En-tête avec la bannière complète */
+    header {
+      background: #0a1d24; border-bottom: 2px solid var(--accent);
+      text-align: center; padding: 0; overflow: hidden;
+    }
+    header img.banner {
+      width: 100%; max-width: 600px; max-height: 185px; object-fit: cover;
+      display: block; margin: auto;
+    }
+
+    /* Bouton d'installation PWA (disparaît automatiquement une fois installé) */
+    #installBanner {
+      display: none; background: linear-gradient(135deg, #1b4859, #102e3a);
+      border: 1px solid var(--accent); border-radius: 12px; padding: 10px 14px;
+      margin: 12px 12px 0; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    #installBanner span { font-size: 0.85rem; color: #fff; font-weight: 600; }
+    #installBtn {
+      background: var(--accent); color: #0a1d24; border: none; border-radius: 8px;
+      padding: 8px 14px; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap;
+    }
 
     #alertBanner {
       display: none; background: var(--alert); color: #fff; padding: 12px 14px;
@@ -70,7 +88,6 @@
     .btn-primary { background: var(--accent); color: #0a1d24; }
     .btn-secondary { background: #265363; color: #fff; }
 
-    /* Liste des OR archivés */
     .or-list-item {
       background: #0c222b; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
       display: flex; justify-content: space-between; align-items: center; gap: 10px;
@@ -107,10 +124,14 @@
 <body>
 
 <header>
-  <img src="./Logo Charlie Factur'Magic.jpg" alt="Logo Charlie">
-  <h1>✨ Charlie Factur'Magic</h1>
-  <p>L'assistant magique d'aide à la facturation</p>
+  <img src="./banniere.jpeg" alt="Charlie Factur'Magic" class="banner">
 </header>
+
+<!-- Bandeau d'installation (disparaît automatiquement dès que l'appli est installée) -->
+<div id="installBanner">
+  <span>📲 Installer l'appli sur l'écran d'accueil</span>
+  <button id="installBtn">Installer</button>
+</div>
 
 <div id="alertBanner">
   <div class="top">
@@ -141,7 +162,6 @@
 
     <div id="loaderOR" class="loader">🪄 Lecture et mise en forme de l'OR en cours...</div>
 
-    <!-- Fiche OR active (après scan ou clic dans la liste) -->
     <div id="resultOR" class="card" style="display:none;">
       <div class="row2">
         <div><label>Date travaux</label><input type="text" id="orDate"></div>
@@ -160,7 +180,6 @@
       <button class="btn btn-secondary" id="btnSaveOR" onclick="saveORToSheet()">💾 Archiver dans Historique_OR</button>
     </div>
 
-    <!-- Liste des OR archivés synchronisés -->
     <div id="archivedORCard" class="card" style="display:none;">
       <div class="card-title">
         <span>📂 OR archivés à facturer</span>
@@ -207,6 +226,37 @@
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbxJQLBw5f5v_1HlM5dC7bdPsBykRfbjPslnpLl3PfEFKp_9P7g1ZxnN3LRsT8WZpJvXjg/exec";
   let currentArchivedORs = [];
+  let deferredPrompt = null;
+
+  // Enregistrement du Service Worker + gestion du bouton d'installation
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  }
+
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!isStandalone) {
+      document.getElementById("installBanner").style.display = "flex";
+    }
+  });
+
+  document.getElementById("installBtn").addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      document.getElementById("installBanner").style.display = "none";
+    }
+    deferredPrompt = null;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    document.getElementById("installBanner").style.display = "none";
+    deferredPrompt = null;
+  });
 
   async function callApi(payload) {
     const res = await fetch(API_URL, {
