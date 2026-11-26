@@ -823,16 +823,22 @@
     } catch (err) { alert("Erreur : " + err.message); }
   }
 
+  async function confirmGarageDownload() {
+    try {
+      const res = await callApi({ action: "confirmGarageExport" });
+      updateUI(res.status);
+    } catch (e) { console.error(e); }
+  }
+
   async function triggerGarageExport() {
     const btn = document.querySelector("#alertGarage button");
     btn.innerText = "⏳ Génération du fichier EBP...";
     btn.disabled = true;
     try {
       const res = await callApi({ action: "exportGarageEBP" });
-      refreshStatus();
       const box = document.getElementById("exportResult");
       box.innerHTML = `✅ Fichier <b>Import_EBP_Garage.csv</b> généré (${res.count} pièce(s)) !<br>
-        <a href="${res.downloadUrl}" target="_blank">⬇️ Télécharger pour EBP Méca Pro</a>`;
+        <a href="${res.downloadUrl}" target="_blank" onclick="confirmGarageDownload()">⬇️ Télécharger pour EBP Méca Pro</a>`;
       box.style.display = "block";
     } catch (err) { alert("Erreur : " + err.message); }
     finally { btn.disabled = false; btn.innerText = "📥 Générer CSV Import EBP"; }
