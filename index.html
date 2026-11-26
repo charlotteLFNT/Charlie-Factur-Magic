@@ -25,7 +25,6 @@
       width: 100%; max-width: 600px; height: auto;
       display: block; margin: auto;
     }
-    }
     #userBadge {
       display: none; position: absolute; top: 8px; right: 8px;
       background: rgba(10, 29, 36, 0.88); border: 1px solid var(--accent);
@@ -153,12 +152,6 @@
     }
     .piece-item.garage-item { border-left-color: #4fc3f7; }
     .piece-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 6px; margin-top: 6px; }
-    .remise-badge {
-      display: inline-block; margin-top: 6px; padding: 4px 8px; border-radius: 6px;
-      font-size: 0.78rem; font-weight: 700;
-    }
-    .remise-yes { background: rgba(245, 176, 39, 0.2); color: var(--accent); border: 1px solid var(--accent); }
-    .remise-no { background: rgba(158, 192, 204, 0.12); color: var(--muted); }
 
     .loader { display: none; text-align: center; padding: 20px; color: var(--accent); font-weight: 600; }
 
@@ -229,7 +222,7 @@
     <div class="top">
       <span>🔧 Garage MATEO : <span id="pendingGarageCount">0</span> pièce(s) prêtes pour EBP</span>
     </div>
-    <button onclick="triggerGarageExport()">📥 Générer Excel Import EBP</button>
+    <button onclick="triggerGarageExport()">📥 Générer CSV Import EBP</button>
   </div>
 
   <div id="exportResult"></div>
@@ -363,7 +356,7 @@
         </div>
         <label>Fournisseur détecté</label>
         <input type="text" id="garageFournisseur">
-        <label>Vérification des tarifs (Brut = PV HT • Net = PA HT)</label>
+        <label>Vérification des tarifs (Brut arrondi TTC = PV HT • Net = PA HT)</label>
         <div id="garagePiecesContainer"></div>
         <button class="btn btn-garage" onclick="saveGarageToSheet()">✅ Valider pour Import EBP</button>
       </div>
@@ -468,7 +461,6 @@
       nav.style.display = "flex";
       switchTab("or");
     } else {
-      // Jérôme : uniquement Garage MATEO, barre de navigation masquée
       document.getElementById("nav-or").style.display = "none";
       document.getElementById("nav-pieces").style.display = "none";
       nav.style.display = "none";
@@ -539,7 +531,6 @@
   function updateUI(status) {
     if (!status || !currentUser) return;
 
-    // Alerte Laurent (ADMIN uniquement)
     const alertL = document.getElementById("alertLaurent");
     if (currentUser.role === "ADMIN" && status.pendingLaurentCount > 0) {
       document.getElementById("pendingLaurentCount").innerText = status.pendingLaurentCount;
@@ -548,7 +539,6 @@
       alertL.style.display = "none";
     }
 
-    // Alerte Garage MATEO (Jérôme + ADMIN)
     const alertG = document.getElementById("alertGarage");
     if (status.pendingGarageCount > 0) {
       document.getElementById("pendingGarageCount").innerText = status.pendingGarageCount;
@@ -557,7 +547,6 @@
       alertG.style.display = "none";
     }
 
-    // OR archivés Laurent (ADMIN uniquement)
     if (currentUser.role === "ADMIN") {
       currentArchivedORs = status.archivedORs || [];
       const card = document.getElementById("archivedORCard");
@@ -761,15 +750,6 @@
   }
 
   // === FONCTIONS GARAGE MATEO (EBP) ===
-  function formatClientRemiseBadge(remFourn) {
-    const r = parseFloat(remFourn) || 0;
-    if (r > 30) {
-      const clientRem = Math.round((r - 30) * 10) / 10;
-      return `<span class="remise-badge remise-yes">🏷️ Remise fournisseur ${r}% → Appliquer ${clientRem}% remise client sur facture</span>`;
-    }
-    return `<span class="remise-badge remise-no">Remise fournisseur ${r}% → Plein tarif client (0% remise)</span>`;
-  }
-
   function updateGarageRow(inputEl) {
     const item = inputEl.closest(".piece-item");
     const brut = parseFloat(item.querySelector(".g-brut").value) || 0;
@@ -777,7 +757,6 @@
     if (inputEl.classList.contains("g-rem")) {
       item.querySelector(".g-net").value = (brut * (1 - rem / 100)).toFixed(2);
     }
-  }
   }
 
   function handleGarageFile(input) {
@@ -793,6 +772,9 @@
         container.innerHTML = "";
         (res.pieces || []).forEach(p => {
           const rem = Number(p.remise_fournisseur || 0);
+          const rawBrut = Number(p.prix_brut_ht || p.prix_net_ht || 0);
+          const pvTTCArrondi = Math.ceil((rawBrut * 1.2 - 1e-9) * 10) / 10;
+          const brutArrondi = (Math.round((pvTTCArrondi / 1.2) * 100) / 100).toFixed(2);
           container.innerHTML += `
             <div class="piece-item garage-item">
               <div class="piece-grid" style="margin-top:0; margin-bottom:6px;">
@@ -801,8 +783,8 @@
               </div>
               <div class="row3">
                 <div>
-                  <label style="margin:0 0 2px;">PV HT (Brut)</label>
-                  <input type="number" step="0.01" class="g-brut" value="${Number(p.prix_brut_ht || 0).toFixed(2)}" oninput="updateGarageRow(this)">
+                  <label style="margin:0 0 2px;">PV HT (Arr. TTC)</label>
+                  <input type="number" step="0.01" class="g-brut" value="${brutArrondi}" oninput="updateGarageRow(this)">
                 </div>
                 <div>
                   <label style="margin:0 0 2px;">Rem. %</label>
@@ -813,7 +795,7 @@
                   <input type="number" step="0.01" class="g-net" value="${Number(p.prix_net_ht || 0).toFixed(2)}" oninput="updateGarageRow(this)">
                 </div>
               </div>
-              </div>`;
+            </div>`;
         });
         document.getElementById("resultGarage").style.display = "block";
       } catch (err) { alert("Erreur : " + err.message); }
@@ -849,11 +831,11 @@
       const res = await callApi({ action: "exportGarageEBP" });
       refreshStatus();
       const box = document.getElementById("exportResult");
-      box.innerHTML = `✅ Fichier <b>Import_EBP_Garage.xlsx</b> généré (${res.count} pièce(s)) !<br>
+      box.innerHTML = `✅ Fichier <b>Import_EBP_Garage.csv</b> généré (${res.count} pièce(s)) !<br>
         <a href="${res.downloadUrl}" target="_blank">⬇️ Télécharger pour EBP Méca Pro</a>`;
       box.style.display = "block";
     } catch (err) { alert("Erreur : " + err.message); }
-    finally { btn.disabled = false; btn.innerText = "📥 Générer Excel Import EBP"; }
+    finally { btn.disabled = false; btn.innerText = "📥 Générer CSV Import EBP"; }
   }
 </script>
 </body>
