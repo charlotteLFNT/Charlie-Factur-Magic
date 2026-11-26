@@ -777,7 +777,7 @@
     if (inputEl.classList.contains("g-brut") || inputEl.classList.contains("g-rem")) {
       item.querySelector(".g-net").value = (brut * (1 - rem / 100)).toFixed(2);
     }
-    item.querySelector(".remise-zone").innerHTML = formatClientRemiseBadge(rem);
+  }
   }
 
   function handleGarageFile(input) {
