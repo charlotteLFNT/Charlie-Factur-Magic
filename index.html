@@ -589,7 +589,7 @@
       const img = new Image();
       img.onload = function() {
         const canvas = document.createElement("canvas");
-        const maxDim = 1800;
+        const maxDim = 1400;
         let w = img.width, h = img.height;
         if (w > maxDim || h > maxDim) {
           if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
@@ -597,9 +597,9 @@
         }
         canvas.width = w; canvas.height = h;
         const ctx = canvas.getContext("2d");
-        ctx.filter = "brightness(115%) contrast(120%)";
+        ctx.filter = "brightness(112%) contrast(118%)";
         ctx.drawImage(img, 0, 0, w, h);
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.80);
         callback(dataUrl.split(",")[1], "image/jpeg");
       };
       img.src = e.target.result;
