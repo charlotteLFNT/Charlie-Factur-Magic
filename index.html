@@ -12,18 +12,47 @@
     :root {
       --bg: #0f2933; --card: #163845; --accent: #f5b027;
       --text: #ffffff; --muted: #9ec0cc; --alert: #e65100; --ok: #2e7d32; --danger: #c62828;
+      --garage: #0288d1;
     }
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 85px; }
 
     header {
-      background: #0a1d24; border-bottom: 2px solid var(--accent);
+      position: relative; background: #0a1d24; border-bottom: 2px solid var(--accent);
       text-align: center; padding: 0; overflow: hidden;
     }
     header img.banner {
       width: 100%; max-width: 600px; max-height: 185px; object-fit: cover;
       display: block; margin: auto;
     }
+    #userBadge {
+      display: none; position: absolute; top: 8px; right: 8px;
+      background: rgba(10, 29, 36, 0.88); border: 1px solid var(--accent);
+      color: #fff; padding: 5px 10px; border-radius: 20px; font-size: 0.78rem;
+      font-weight: 700; cursor: pointer; backdrop-filter: blur(4px);
+    }
+
+    /* Écran de verrouillage PIN */
+    #loginScreen {
+      max-width: 360px; margin: 24px auto; padding: 20px; background: var(--card);
+      border-radius: 18px; text-align: center; border: 1px solid #2b5869;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    #loginScreen h2 { margin: 0 0 6px; color: var(--accent); font-size: 1.2rem; }
+    #loginScreen p { margin: 0 0 18px; color: var(--muted); font-size: 0.85rem; }
+    .pin-dots { display: flex; justify-content: center; gap: 14px; margin-bottom: 20px; }
+    .pin-dot {
+      width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--accent);
+      background: transparent; transition: background 0.15s;
+    }
+    .pin-dot.filled { background: var(--accent); }
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .key-btn {
+      background: #0c222b; color: #fff; border: 1px solid #2b5869; border-radius: 12px;
+      padding: 15px 0; font-size: 1.3rem; font-weight: 700; cursor: pointer;
+    }
+    .key-btn:active { background: var(--accent); color: #0a1d24; }
+    #loginError { color: #ff8a80; font-size: 0.85rem; margin-top: 12px; min-height: 20px; font-weight: 600; }
 
     #installBanner {
       display: none; background: linear-gradient(135deg, #1b4859, #102e3a);
@@ -36,15 +65,20 @@
       padding: 8px 14px; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap;
     }
 
-    #alertBanner {
-      display: none; background: var(--alert); color: #fff; padding: 12px 14px;
+    .alert-box {
+      display: none; color: #fff; padding: 12px 14px;
       margin: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    #alertBanner .top { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.92rem; }
-    #alertBanner button {
-      margin-top: 8px; width: 100%; background: #fff; color: var(--alert); border: none;
+    #alertLaurent { background: var(--alert); }
+    #alertGarage { background: var(--garage); }
+    .alert-box .top { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.92rem; }
+    .alert-box button {
+      margin-top: 8px; width: 100%; background: #fff; border: none;
       padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer;
     }
+    #alertLaurent button { color: var(--alert); }
+    #alertGarage button { color: var(--garage); }
+
     #exportResult {
       display: none; background: var(--ok); color: #fff; padding: 12px; margin: 12px;
       border-radius: 12px; text-align: center; font-size: 0.9rem;
@@ -63,9 +97,11 @@
       background: var(--card); border: 2px dashed var(--accent); border-radius: 16px;
       padding: 20px 10px; text-align: center; cursor: pointer;
     }
+    .scan-box.garage-border { border-color: #4fc3f7; }
     .scan-box.alt { border-style: solid; border-color: #2b5869; }
     .scan-box span { font-size: 2rem; display: block; margin-bottom: 6px; }
     .scan-box strong { color: var(--accent); font-size: 0.95rem; display: block; }
+    .scan-box.garage-border strong { color: #4fc3f7; }
     .scan-box.alt strong { color: #fff; }
     input[type="file"] { display: none; }
 
@@ -76,25 +112,17 @@
       width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2b5869;
       background: #0c222b; color: #fff; font-size: 0.95rem;
     }
-    textarea {
-      min-height: 90px; line-height: 1.45; resize: none; overflow: hidden;
-    }
+    textarea { min-height: 90px; line-height: 1.45; resize: none; overflow: hidden; }
     .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row3 { display: grid; grid-template-columns: 1fr 0.8fr 1fr; gap: 6px; margin-top: 6px; }
 
-    /* Raccourci copier en bout de cellule */
-    .copy-group {
-      display: flex; align-items: stretch; gap: 6px;
-    }
-    .copy-group input, .copy-group textarea {
-      flex: 1; min-width: 0;
-    }
+    .copy-group { display: flex; align-items: stretch; gap: 6px; }
+    .copy-group input, .copy-group textarea { flex: 1; min-width: 0; }
     .btn-copy-cell {
       background: #234e5e; color: var(--accent); border: 1px solid #2b5869;
       border-radius: 8px; padding: 0 11px; font-size: 1rem; cursor: pointer;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      transition: background 0.15s;
     }
-    .btn-copy-cell:active { background: var(--accent); color: #0a1d24; }
     .btn-copy-cell.copied { background: var(--ok); color: #fff; border-color: var(--ok); }
 
     .btn {
@@ -102,6 +130,7 @@
       font-size: 0.98rem; cursor: pointer; margin-top: 10px;
     }
     .btn-primary { background: var(--accent); color: #0a1d24; }
+    .btn-garage { background: #4fc3f7; color: #0a1d24; }
     .btn-secondary { background: #265363; color: #fff; }
 
     .or-list-item {
@@ -118,29 +147,37 @@
     }
 
     .piece-item {
-      background: #0c222b; padding: 10px; border-radius: 10px; margin-bottom: 8px;
+      background: #0c222b; padding: 10px; border-radius: 10px; margin-bottom: 10px;
       border-left: 3px solid var(--accent);
     }
+    .piece-item.garage-item { border-left-color: #4fc3f7; }
     .piece-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 6px; margin-top: 6px; }
+    .remise-badge {
+      display: inline-block; margin-top: 6px; padding: 4px 8px; border-radius: 6px;
+      font-size: 0.78rem; font-weight: 700;
+    }
+    .remise-yes { background: rgba(245, 176, 39, 0.2); color: var(--accent); border: 1px solid var(--accent); }
+    .remise-no { background: rgba(158, 192, 204, 0.12); color: var(--muted); }
 
     .loader { display: none; text-align: center; padding: 20px; color: var(--accent); font-weight: 600; }
 
     nav {
       position: fixed; bottom: 0; left: 0; right: 0; background: #0a1d24;
-      display: flex; border-top: 1px solid #244b59; height: 68px;
+      display: none; border-top: 1px solid #244b59; height: 68px;
     }
     nav button {
-      flex: 1; background: none; border: none; color: var(--muted); font-size: 0.85rem;
-      font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      flex: 1; background: none; border: none; color: var(--muted); font-size: 0.78rem;
+      font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
     }
     nav button.active { color: var(--accent); background: rgba(245, 176, 39, 0.08); }
-    nav button span { font-size: 1.3rem; }
+    nav button span { font-size: 1.25rem; }
   </style>
 </head>
 <body>
 
 <header>
   <img src="./banniere.jpeg" alt="Charlie Factur'Magic" class="banner">
+  <button id="userBadge" onclick="logout()">🔒 <span id="userNameLabel"></span></button>
 </header>
 
 <div id="installBanner">
@@ -148,127 +185,201 @@
   <button id="installBtn">Installer</button>
 </div>
 
-<div id="alertBanner">
-  <div class="top">
-    <span>⚠️ <span id="pendingCount">0</span> pièce(s) à mettre à jour dans Pennylane</span>
+<!-- ÉCRAN DE CONNEXION PIN -->
+<div id="loginScreen">
+  <h2>🔐 Accès sécurisé</h2>
+  <p>Saisis ton code à 4 chiffres</p>
+  <div class="pin-dots">
+    <div class="pin-dot" id="dot0"></div>
+    <div class="pin-dot" id="dot1"></div>
+    <div class="pin-dot" id="dot2"></div>
+    <div class="pin-dot" id="dot3"></div>
   </div>
-  <button onclick="triggerPennylaneExport()">📥 Générer le fichier Excel Pennylane</button>
+  <div class="keypad">
+    <button class="key-btn" onclick="pressKey('1')">1</button>
+    <button class="key-btn" onclick="pressKey('2')">2</button>
+    <button class="key-btn" onclick="pressKey('3')">3</button>
+    <button class="key-btn" onclick="pressKey('4')">4</button>
+    <button class="key-btn" onclick="pressKey('5')">5</button>
+    <button class="key-btn" onclick="pressKey('6')">6</button>
+    <button class="key-btn" onclick="pressKey('7')">7</button>
+    <button class="key-btn" onclick="pressKey('8')">8</button>
+    <button class="key-btn" onclick="pressKey('9')">9</button>
+    <button class="key-btn" style="font-size:0.9rem; color:var(--muted);" onclick="clearPin()">Effacer</button>
+    <button class="key-btn" onclick="pressKey('0')">0</button>
+    <button class="key-btn" style="font-size:1rem; color:var(--accent);" onclick="backspacePin()">⌫</button>
+  </div>
+  <div id="loginError"></div>
 </div>
 
-<div id="exportResult"></div>
+<!-- APPLICATION DÉVERROUILLÉE -->
+<div id="appContent" style="display:none;">
 
-<div class="container">
-  <!-- ONGLET 1 : OR -->
-  <div id="tab-or" class="tab-content active">
-    <div class="scan-grid">
-      <div class="scan-box" onclick="document.getElementById('camOR').click()">
-        <span>📷</span>
-        <strong>Photo OR</strong>
-        <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Appareil photo</div>
-      </div>
-      <div class="scan-box alt" onclick="document.getElementById('galOR').click()">
-        <span>📄</span>
-        <strong>Fichier / PDF</strong>
-        <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Galerie ou PDF</div>
-      </div>
+  <!-- Bandeau alerte Laurent (ADMIN uniquement) -->
+  <div id="alertLaurent" class="alert-box">
+    <div class="top">
+      <span>⚠️ Laurent : <span id="pendingLaurentCount">0</span> pièce(s) à importer dans Pennylane</span>
     </div>
-    <input type="file" id="camOR" accept="image/*" capture="environment" onchange="handleORFile(this)">
-    <input type="file" id="galOR" accept="image/*,application/pdf" onchange="handleORFile(this)">
+    <button onclick="triggerPennylaneExport()">📥 Générer Excel Pennylane</button>
+  </div>
 
-    <div id="loaderOR" class="loader">🪄 Lecture et mise en forme de l'OR en cours...</div>
+  <!-- Bandeau alerte Garage MATEO (Jérôme + Charlie) -->
+  <div id="alertGarage" class="alert-box">
+    <div class="top">
+      <span>🔧 Garage MATEO : <span id="pendingGarageCount">0</span> pièce(s) prêtes pour EBP</span>
+    </div>
+    <button onclick="triggerGarageExport()">📥 Générer Excel Import EBP</button>
+  </div>
 
-    <div id="resultOR" class="card" style="display:none;">
-      <div class="row2">
-        <div>
-          <label>Date travaux</label>
-          <div class="copy-group">
-            <input type="text" id="orDate">
-            <button type="button" class="btn-copy-cell" title="Copier la date" onclick="copyField('orDate', this)">📋</button>
-          </div>
+  <div id="exportResult"></div>
+
+  <div class="container">
+    <!-- ONGLET 1 : OR LAURENT (ADMIN) -->
+    <div id="tab-or" class="tab-content">
+      <div class="scan-grid">
+        <div class="scan-box" onclick="document.getElementById('camOR').click()">
+          <span>📷</span>
+          <strong>Photo OR</strong>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Appareil photo</div>
         </div>
-        <div>
-          <label>Heures à facturer</label>
-          <div class="copy-group">
-            <input type="text" id="orHeuresMO">
-            <button type="button" class="btn-copy-cell" title="Copier les heures" onclick="copyField('orHeuresMO', this)">📋</button>
-          </div>
+        <div class="scan-box alt" onclick="document.getElementById('galOR').click()">
+          <span>📄</span>
+          <strong>Fichier / PDF</strong>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Galerie ou PDF</div>
         </div>
       </div>
+      <input type="file" id="camOR" accept="image/*" capture="environment" onchange="handleORFile(this)">
+      <input type="file" id="galOR" accept="image/*,application/pdf" onchange="handleORFile(this)">
 
-      <label>Client</label>
-      <div class="copy-group">
-        <input type="text" id="orClient">
-        <button type="button" class="btn-copy-cell" title="Copier le client" onclick="copyField('orClient', this)">📋</button>
+      <div id="loaderOR" class="loader">🪄 Lecture et mise en forme de l'OR en cours...</div>
+
+      <div id="resultOR" class="card" style="display:none;">
+        <div class="row2">
+          <div>
+            <label>Date travaux</label>
+            <div class="copy-group">
+              <input type="text" id="orDate">
+              <button type="button" class="btn-copy-cell" onclick="copyField('orDate', this)">📋</button>
+            </div>
+          </div>
+          <div>
+            <label>Heures à facturer</label>
+            <div class="copy-group">
+              <input type="text" id="orHeuresMO">
+              <button type="button" class="btn-copy-cell" onclick="copyField('orHeuresMO', this)">📋</button>
+            </div>
+          </div>
+        </div>
+
+        <label>Client</label>
+        <div class="copy-group">
+          <input type="text" id="orClient">
+          <button type="button" class="btn-copy-cell" onclick="copyField('orClient', this)">📋</button>
+        </div>
+
+        <label>Engin / Véhicule</label>
+        <div class="copy-group">
+          <input type="text" id="orEngin">
+          <button type="button" class="btn-copy-cell" onclick="copyField('orEngin', this)">📋</button>
+        </div>
+
+        <label>Heures / Km engin</label>
+        <div class="copy-group">
+          <input type="text" id="orHeuresEngin">
+          <button type="button" class="btn-copy-cell" onclick="copyField('orHeuresEngin', this)">📋</button>
+        </div>
+
+        <label>Texte reformulé pour Pennylane</label>
+        <div class="copy-group">
+          <textarea id="orTextePropre" oninput="autoResizeTextarea(this)"></textarea>
+          <button type="button" class="btn-copy-cell" onclick="copyField('orTextePropre', this)">📋</button>
+        </div>
+        <input type="hidden" id="orTexteBrut">
+
+        <button class="btn btn-primary" onclick="copyORText()">📋 Copier tout le bloc pour Pennylane</button>
+        <button class="btn btn-secondary" id="btnSaveOR" onclick="saveORToSheet()">💾 Archiver dans Historique_OR</button>
       </div>
 
-      <label>Engin / Véhicule</label>
-      <div class="copy-group">
-        <input type="text" id="orEngin">
-        <button type="button" class="btn-copy-cell" title="Copier l'engin" onclick="copyField('orEngin', this)">📋</button>
+      <div id="archivedORCard" class="card" style="display:none;">
+        <div class="card-title">
+          <span>📂 OR archivés à facturer</span>
+          <span style="font-size:0.75rem; color:var(--muted); font-weight:normal;">Toucher pour ouvrir</span>
+        </div>
+        <div id="archivedORList"></div>
       </div>
-
-      <label>Heures / Km engin</label>
-      <div class="copy-group">
-        <input type="text" id="orHeuresEngin">
-        <button type="button" class="btn-copy-cell" title="Copier le compteur" onclick="copyField('orHeuresEngin', this)">📋</button>
-      </div>
-
-      <label>Texte reformulé pour Pennylane</label>
-      <div class="copy-group">
-        <textarea id="orTextePropre" oninput="autoResizeTextarea(this)"></textarea>
-        <button type="button" class="btn-copy-cell" title="Copier le détail" onclick="copyField('orTextePropre', this)">📋</button>
-      </div>
-      <input type="hidden" id="orTexteBrut">
-
-      <button class="btn btn-primary" onclick="copyORText()">📋 Copier tout le bloc pour Pennylane</button>
-      <button class="btn btn-secondary" id="btnSaveOR" onclick="saveORToSheet()">💾 Archiver dans Historique_OR</button>
     </div>
 
-    <div id="archivedORCard" class="card" style="display:none;">
-      <div class="card-title">
-        <span>📂 OR archivés à facturer</span>
-        <span style="font-size:0.75rem; color:var(--muted); font-weight:normal;">Toucher pour ouvrir</span>
+    <!-- ONGLET 2 : PIECES LAURENT (ADMIN) -->
+    <div id="tab-pieces" class="tab-content">
+      <div class="scan-grid">
+        <div class="scan-box" onclick="document.getElementById('camPieces').click()">
+          <span>📷</span>
+          <strong>BL / Facture Laurent</strong>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Appareil photo</div>
+        </div>
+        <div class="scan-box alt" onclick="document.getElementById('galPieces').click()">
+          <span>📄</span>
+          <strong>Fichier / PDF</strong>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Galerie ou PDF</div>
+        </div>
       </div>
-      <div id="archivedORList"></div>
+      <input type="file" id="camPieces" accept="image/*" capture="environment" onchange="handlePiecesFile(this)">
+      <input type="file" id="galPieces" accept="image/*,application/pdf" onchange="handlePiecesFile(this)">
+
+      <div id="loaderPieces" class="loader">🔍 Extraction des références et prix Pennylane...</div>
+
+      <div id="resultPieces" class="card" style="display:none;">
+        <label>Fournisseur détecté</label>
+        <input type="text" id="fournisseurName">
+        <label>Pièces détectées (vérifie avant enregistrement)</label>
+        <div id="piecesListContainer"></div>
+        <button class="btn btn-primary" onclick="savePiecesToBase()">✅ Enregistrer dans Base_Pièces (Laurent)</button>
+      </div>
+    </div>
+
+    <!-- ONGLET 3 : GARAGE MATEO / EBP (JEROME + CHARLIE) -->
+    <div id="tab-garage" class="tab-content">
+      <div class="scan-grid">
+        <div class="scan-box garage-border" onclick="document.getElementById('camGarage').click()">
+          <span>📷</span>
+          <strong>BL / Facture Garage</strong>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Appareil photo</div>
+        </div>
+        <div class="scan-box alt" onclick="document.getElementById('galGarage').click()">
+          <span>📄</span>
+          <strong>Fichier / PDF</strong>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Galerie ou PDF</div>
+        </div>
+      </div>
+      <input type="file" id="camGarage" accept="image/*" capture="environment" onchange="handleGarageFile(this)">
+      <input type="file" id="galGarage" accept="image/*,application/pdf" onchange="handleGarageFile(this)">
+
+      <div id="loaderGarage" class="loader" style="color:#4fc3f7;">🔧 Lecture du BL / Facture Garage MATEO...</div>
+
+      <div id="resultGarage" class="card" style="display:none;">
+        <div class="card-title" style="color:#4fc3f7;">
+          <span>🔧 Pièces Garage MATEO (EBP)</span>
+        </div>
+        <label>Fournisseur détecté</label>
+        <input type="text" id="garageFournisseur">
+        <label>Vérification des tarifs (Brut = PV HT • Net = PA HT)</label>
+        <div id="garagePiecesContainer"></div>
+        <button class="btn btn-garage" onclick="saveGarageToSheet()">✅ Valider pour Import EBP</button>
+      </div>
     </div>
   </div>
 
-  <!-- ONGLET 2 : PIECES -->
-  <div id="tab-pieces" class="tab-content">
-    <div class="scan-grid">
-      <div class="scan-box" onclick="document.getElementById('camPieces').click()">
-        <span>📷</span>
-        <strong>Photo BL / Facture</strong>
-        <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Appareil photo</div>
-      </div>
-      <div class="scan-box alt" onclick="document.getElementById('galPieces').click()">
-        <span>📄</span>
-        <strong>Fichier / PDF</strong>
-        <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Galerie ou PDF</div>
-      </div>
-    </div>
-    <input type="file" id="camPieces" accept="image/*" capture="environment" onchange="handlePiecesFile(this)">
-    <input type="file" id="galPieces" accept="image/*,application/pdf" onchange="handlePiecesFile(this)">
-
-    <div id="loaderPieces" class="loader">🔍 Extraction des références et prix en cours...</div>
-
-    <div id="resultPieces" class="card" style="display:none;">
-      <label>Fournisseur détecté</label>
-      <input type="text" id="fournisseurName">
-      <label>Pièces détectées (vérifie avant enregistrement)</label>
-      <div id="piecesListContainer"></div>
-      <button class="btn btn-primary" onclick="savePiecesToBase()">✅ Enregistrer dans Base_Pièces</button>
-    </div>
-  </div>
+  <nav id="bottomNav">
+    <button id="nav-or" onclick="switchTab('or')"><span>📋</span>OR Laurent</button>
+    <button id="nav-pieces" onclick="switchTab('pieces')"><span>🚜</span>Pièces Laurent</button>
+    <button id="nav-garage" onclick="switchTab('garage')"><span>🔧</span>Garage EBP</button>
+  </nav>
 </div>
-
-<nav>
-  <button id="nav-or" class="active" onclick="switchTab('or')"><span>📋</span>Ordres de Rép.</button>
-  <button id="nav-pieces" onclick="switchTab('pieces')"><span>🔩</span>Pièces & Prix</button>
-</nav>
 
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbxJQLBw5f5v_1HlM5dC7bdPsBykRfbjPslnpLl3PfEFKp_9P7g1ZxnN3LRsT8WZpJvXjg/exec";
+  let currentUser = null;
+  let pinBuffer = "";
   let currentArchivedORs = [];
   let deferredPrompt = null;
 
@@ -281,18 +392,14 @@
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    if (!isStandalone) {
-      document.getElementById("installBanner").style.display = "flex";
-    }
+    if (!isStandalone) document.getElementById("installBanner").style.display = "flex";
   });
 
   document.getElementById("installBtn").addEventListener("click", async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      document.getElementById("installBanner").style.display = "none";
-    }
+    if (outcome === "accepted") document.getElementById("installBanner").style.display = "none";
     deferredPrompt = null;
   });
 
@@ -301,7 +408,98 @@
     deferredPrompt = null;
   });
 
-  // Ajuste automatiquement la hauteur de la zone texte à son contenu complet
+  // === GESTION DU CODE PIN ===
+  function updatePinDots() {
+    for (let i = 0; i < 4; i++) {
+      document.getElementById("dot" + i).classList.toggle("filled", i < pinBuffer.length);
+    }
+  }
+
+  function pressKey(digit) {
+    if (pinBuffer.length >= 4) return;
+    document.getElementById("loginError").innerText = "";
+    pinBuffer += digit;
+    updatePinDots();
+    if (pinBuffer.length === 4) {
+      submitPin();
+    }
+  }
+
+  function backspacePin() {
+    pinBuffer = pinBuffer.slice(0, -1);
+    updatePinDots();
+  }
+
+  function clearPin() {
+    pinBuffer = "";
+    updatePinDots();
+    document.getElementById("loginError").innerText = "";
+  }
+
+  async function submitPin() {
+    const errEl = document.getElementById("loginError");
+    errEl.style.color = "#f5b027";
+    errEl.innerText = "⏳ Vérification...";
+    try {
+      const res = await callApi({ action: "login", pin: pinBuffer });
+      currentUser = res.user;
+      sessionStorage.setItem("cfm_pin", pinBuffer);
+      unlockApp(res.user, res.status);
+    } catch (e) {
+      errEl.style.color = "#ff8a80";
+      errEl.innerText = "❌ Code incorrect";
+      pinBuffer = "";
+      updatePinDots();
+    }
+  }
+
+  function unlockApp(user, status) {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("appContent").style.display = "block";
+    document.getElementById("userNameLabel").innerText = user.name;
+    document.getElementById("userBadge").style.display = "block";
+
+    const nav = document.getElementById("bottomNav");
+    if (user.role === "ADMIN") {
+      document.getElementById("nav-or").style.display = "flex";
+      document.getElementById("nav-pieces").style.display = "flex";
+      document.getElementById("nav-garage").style.display = "flex";
+      nav.style.display = "flex";
+      switchTab("or");
+    } else {
+      // Jérôme : uniquement Garage MATEO, barre de navigation masquée
+      document.getElementById("nav-or").style.display = "none";
+      document.getElementById("nav-pieces").style.display = "none";
+      nav.style.display = "none";
+      switchTab("garage");
+    }
+    updateUI(status);
+  }
+
+  function logout() {
+    sessionStorage.removeItem("cfm_pin");
+    currentUser = null;
+    pinBuffer = "";
+    updatePinDots();
+    document.getElementById("loginError").innerText = "";
+    document.getElementById("appContent").style.display = "none";
+    document.getElementById("userBadge").style.display = "none";
+    document.getElementById("loginScreen").style.display = "block";
+  }
+
+  window.onload = async function() {
+    const savedPin = sessionStorage.getItem("cfm_pin");
+    if (savedPin) {
+      try {
+        const res = await callApi({ action: "login", pin: savedPin });
+        currentUser = res.user;
+        unlockApp(res.user, res.status);
+      } catch (e) {
+        sessionStorage.removeItem("cfm_pin");
+      }
+    }
+  };
+
   function autoResizeTextarea(el) {
     if (!el) return;
     el.style.height = "auto";
@@ -314,10 +512,7 @@
       const original = btn.innerText;
       btn.innerText = "✅";
       btn.classList.add("copied");
-      setTimeout(() => {
-        btn.innerText = original;
-        btn.classList.remove("copied");
-      }, 1000);
+      setTimeout(() => { btn.innerText = original; btn.classList.remove("copied"); }, 1000);
     });
   }
 
@@ -332,70 +527,56 @@
     return json.data;
   }
 
-  window.onload = refreshStatus;
-
   async function refreshStatus() {
+    if (!currentUser) return;
     try {
-      const status = await callApi({ action: "getStatus" });
+      const status = await callApi({ action: "getStatus", role: currentUser.role });
       updateUI(status);
     } catch (e) { console.error(e); }
   }
 
   function updateUI(status) {
-    if (!status) return;
-    const banner = document.getElementById("alertBanner");
-    if (status.pendingCount > 0) {
-      document.getElementById("pendingCount").innerText = status.pendingCount;
-      banner.style.display = "block";
+    if (!status || !currentUser) return;
+
+    // Alerte Laurent (ADMIN uniquement)
+    const alertL = document.getElementById("alertLaurent");
+    if (currentUser.role === "ADMIN" && status.pendingLaurentCount > 0) {
+      document.getElementById("pendingLaurentCount").innerText = status.pendingLaurentCount;
+      alertL.style.display = "block";
     } else {
-      banner.style.display = "none";
+      alertL.style.display = "none";
     }
 
-    currentArchivedORs = status.archivedORs || [];
-    const card = document.getElementById("archivedORCard");
-    const list = document.getElementById("archivedORList");
-    if (currentArchivedORs.length > 0) {
-      list.innerHTML = "";
-      currentArchivedORs.forEach((or, index) => {
-        list.innerHTML += `
-          <div class="or-list-item">
-            <div class="or-list-info" onclick="openArchivedOR(${index})">
-              <div class="top-line">${or.date ? or.date + " — " : ""}${or.client}</div>
-              <div class="sub-line">${or.engin || "Matériel non précisé"}${or.heures_mo ? " • " + or.heures_mo + "h MO" : ""}</div>
-            </div>
-            <button class="btn-del" onclick="removeArchivedOR(${or.row})">Effacer</button>
-          </div>`;
-      });
-      card.style.display = "block";
+    // Alerte Garage MATEO (Jérôme + ADMIN)
+    const alertG = document.getElementById("alertGarage");
+    if (status.pendingGarageCount > 0) {
+      document.getElementById("pendingGarageCount").innerText = status.pendingGarageCount;
+      alertG.style.display = "block";
     } else {
-      card.style.display = "none";
+      alertG.style.display = "none";
     }
-  }
 
-  function openArchivedOR(index) {
-    const or = currentArchivedORs[index];
-    if (!or) return;
-    document.getElementById("orDate").value = or.date || "";
-    document.getElementById("orClient").value = or.client || "";
-    document.getElementById("orEngin").value = or.engin || "";
-    document.getElementById("orHeuresEngin").value = or.heures_engin || "";
-    document.getElementById("orHeuresMO").value = or.heures_mo || "";
-    const txtEl = document.getElementById("orTextePropre");
-    txtEl.value = or.texte_facture || "";
-    document.getElementById("orTexteBrut").value = or.texte_brut || "";
-    document.getElementById("btnSaveOR").style.display = "none";
-    document.getElementById("resultOR").style.display = "block";
-    autoResizeTextarea(txtEl);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  async function removeArchivedOR(row) {
-    if (!confirm("Effacer cet OR de la liste ?")) return;
-    try {
-      const res = await callApi({ action: "deleteOR", row: row });
-      updateUI(res.status);
-    } catch (err) {
-      alert("Erreur : " + err.message);
+    // OR archivés Laurent (ADMIN uniquement)
+    if (currentUser.role === "ADMIN") {
+      currentArchivedORs = status.archivedORs || [];
+      const card = document.getElementById("archivedORCard");
+      const list = document.getElementById("archivedORList");
+      if (currentArchivedORs.length > 0) {
+        list.innerHTML = "";
+        currentArchivedORs.forEach((or, index) => {
+          list.innerHTML += `
+            <div class="or-list-item">
+              <div class="or-list-info" onclick="openArchivedOR(${index})">
+                <div class="top-line">${or.date ? or.date + " — " : ""}${or.client}</div>
+                <div class="sub-line">${or.engin || "Matériel non précisé"}${or.heures_mo ? " • " + or.heures_mo + "h MO" : ""}</div>
+              </div>
+              <button class="btn-del" onclick="removeArchivedOR(${or.row})">Effacer</button>
+            </div>`;
+        });
+        card.style.display = "block";
+      } else {
+        card.style.display = "none";
+      }
     }
   }
 
@@ -403,7 +584,9 @@
     document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
     document.querySelectorAll("nav button").forEach(el => el.classList.remove("active"));
     document.getElementById("tab-" + tab).classList.add("active");
-    document.getElementById("nav-" + tab).classList.add("active");
+    const navBtn = document.getElementById("nav-" + tab);
+    if (navBtn) navBtn.classList.add("active");
+    document.getElementById("exportResult").style.display = "none";
   }
 
   function prepareFile(file, callback) {
@@ -434,6 +617,32 @@
     reader.readAsDataURL(file);
   }
 
+  // === FONCTIONS LAURENT ===
+  function openArchivedOR(index) {
+    const or = currentArchivedORs[index];
+    if (!or) return;
+    document.getElementById("orDate").value = or.date || "";
+    document.getElementById("orClient").value = or.client || "";
+    document.getElementById("orEngin").value = or.engin || "";
+    document.getElementById("orHeuresEngin").value = or.heures_engin || "";
+    document.getElementById("orHeuresMO").value = or.heures_mo || "";
+    const txtEl = document.getElementById("orTextePropre");
+    txtEl.value = or.texte_facture || "";
+    document.getElementById("orTexteBrut").value = or.texte_brut || "";
+    document.getElementById("btnSaveOR").style.display = "none";
+    document.getElementById("resultOR").style.display = "block";
+    autoResizeTextarea(txtEl);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function removeArchivedOR(row) {
+    if (!confirm("Effacer cet OR de la liste ?")) return;
+    try {
+      const res = await callApi({ action: "deleteOR", row: row });
+      updateUI(res.status);
+    } catch (err) { alert("Erreur : " + err.message); }
+  }
+
   function handleORFile(input) {
     if (!input.files[0]) return;
     document.getElementById("loaderOR").style.display = "block";
@@ -453,12 +662,8 @@
         document.getElementById("btnSaveOR").style.display = "block";
         document.getElementById("resultOR").style.display = "block";
         autoResizeTextarea(txtEl);
-      } catch (err) {
-        alert("Erreur : " + err.message);
-      } finally {
-        document.getElementById("loaderOR").style.display = "none";
-        input.value = "";
-      }
+      } catch (err) { alert("Erreur : " + err.message); }
+      finally { document.getElementById("loaderOR").style.display = "none"; input.value = ""; }
     });
   }
 
@@ -468,11 +673,8 @@
       document.getElementById("orHeuresEngin").value ? "(" + document.getElementById("orHeuresEngin").value + ")" : "",
       document.getElementById("orDate").value ? "- Intervention du " + document.getElementById("orDate").value : ""
     ].filter(Boolean).join(" ");
-
     const fullText = (header ? header + "\n" : "") + document.getElementById("orTextePropre").value;
-    navigator.clipboard.writeText(fullText).then(() => {
-      alert("✅ Bloc complet copié ! Tu peux le coller dans Pennylane.");
-    });
+    navigator.clipboard.writeText(fullText).then(() => alert("✅ Bloc complet copié !"));
   }
 
   async function saveORToSheet() {
@@ -490,7 +692,7 @@
         }
       });
       updateUI(res.status);
-      alert("💾 OR archivé et visible sur tous tes appareils !");
+      alert("💾 OR archivé !");
     } catch (err) { alert("Erreur : " + err.message); }
   }
 
@@ -518,19 +720,15 @@
             </div>`;
         });
         document.getElementById("resultPieces").style.display = "block";
-      } catch (err) {
-        alert("Erreur : " + err.message);
-      } finally {
-        document.getElementById("loaderPieces").style.display = "none";
-        input.value = "";
-      }
+      } catch (err) { alert("Erreur : " + err.message); }
+      finally { document.getElementById("loaderPieces").style.display = "none"; input.value = ""; }
     });
   }
 
   async function savePiecesToBase() {
     const fournisseur = document.getElementById("fournisseurName").value;
     const items = [];
-    document.querySelectorAll(".piece-item").forEach(div => {
+    document.querySelectorAll("#piecesListContainer .piece-item").forEach(div => {
       items.push({
         id: div.querySelector(".p-id").value,
         nom: div.querySelector(".p-nom").value,
@@ -540,29 +738,122 @@
     });
     try {
       const res = await callApi({ action: "upsertPieces", fournisseur: fournisseur, pieces: items });
-      alert(`✅ Base mise à jour !\n• Nouvelles : ${res.created}\n• Prix modifiés : ${res.updated}\n• Inchangées : ${res.unchanged}`);
+      alert(`✅ Base Laurent mise à jour !\n• Nouvelles : ${res.created}\n• Modifiées : ${res.updated}`);
       document.getElementById("resultPieces").style.display = "none";
       updateUI(res.status);
     } catch (err) { alert("Erreur : " + err.message); }
   }
 
   async function triggerPennylaneExport() {
-    const btn = document.querySelector("#alertBanner button");
-    btn.innerText = "⏳ Génération du fichier Excel en cours...";
+    const btn = document.querySelector("#alertLaurent button");
+    btn.innerText = "⏳ Génération Excel Pennylane...";
     btn.disabled = true;
     try {
       const res = await callApi({ action: "exportPennylane" });
       refreshStatus();
       const box = document.getElementById("exportResult");
       box.innerHTML = `✅ Fichier <b>Export_Pennylane_MAJ.xlsx</b> généré (${res.count} pièce(s)) !<br>
-        <a href="${res.downloadUrl}" target="_blank">⬇️ Télécharger le fichier Excel</a>`;
+        <a href="${res.downloadUrl}" target="_blank">⬇️ Télécharger pour Pennylane</a>`;
       box.style.display = "block";
-    } catch (err) {
-      alert("Erreur : " + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.innerText = "📥 Générer le fichier Excel Pennylane";
+    } catch (err) { alert("Erreur : " + err.message); }
+    finally { btn.disabled = false; btn.innerText = "📥 Générer Excel Pennylane"; }
+  }
+
+  // === FONCTIONS GARAGE MATEO (EBP) ===
+  function formatClientRemiseBadge(remFourn) {
+    const r = parseFloat(remFourn) || 0;
+    if (r > 30) {
+      const clientRem = Math.round((r - 30) * 10) / 10;
+      return `<span class="remise-badge remise-yes">🏷️ Remise fournisseur ${r}% → Appliquer ${clientRem}% remise client sur facture</span>`;
     }
+    return `<span class="remise-badge remise-no">Remise fournisseur ${r}% → Plein tarif client (0% remise)</span>`;
+  }
+
+  function updateGarageRow(inputEl) {
+    const item = inputEl.closest(".piece-item");
+    const brut = parseFloat(item.querySelector(".g-brut").value) || 0;
+    const rem = parseFloat(item.querySelector(".g-rem").value) || 0;
+    if (inputEl.classList.contains("g-brut") || inputEl.classList.contains("g-rem")) {
+      item.querySelector(".g-net").value = (brut * (1 - rem / 100)).toFixed(2);
+    }
+    item.querySelector(".remise-zone").innerHTML = formatClientRemiseBadge(rem);
+  }
+
+  function handleGarageFile(input) {
+    if (!input.files[0]) return;
+    document.getElementById("loaderGarage").style.display = "block";
+    document.getElementById("resultGarage").style.display = "none";
+
+    prepareFile(input.files[0], async (b64, mime) => {
+      try {
+        const res = await callApi({ action: "analyzeGarageInvoice", base64: b64, mimeType: mime });
+        document.getElementById("garageFournisseur").value = res.fournisseur || "";
+        const container = document.getElementById("garagePiecesContainer");
+        container.innerHTML = "";
+        (res.pieces || []).forEach(p => {
+          const rem = Number(p.remise_fournisseur || 0);
+          container.innerHTML += `
+            <div class="piece-item garage-item">
+              <div class="piece-grid" style="margin-top:0; margin-bottom:6px;">
+                <input type="text" class="g-id" value="${(p.id || "").replace(/"/g, '&quot;')}" placeholder="Code référence">
+                <input type="text" class="g-nom" value="${(p.nom || "").replace(/"/g, '&quot;')}" placeholder="Libellé pièce">
+              </div>
+              <div class="row3">
+                <div>
+                  <label style="margin:0 0 2px;">PV HT (Brut)</label>
+                  <input type="number" step="0.01" class="g-brut" value="${Number(p.prix_brut_ht || 0).toFixed(2)}" oninput="updateGarageRow(this)">
+                </div>
+                <div>
+                  <label style="margin:0 0 2px;">Rem. %</label>
+                  <input type="number" step="0.1" class="g-rem" value="${rem}" oninput="updateGarageRow(this)">
+                </div>
+                <div>
+                  <label style="margin:0 0 2px;">PA HT (Net)</label>
+                  <input type="number" step="0.01" class="g-net" value="${Number(p.prix_net_ht || 0).toFixed(2)}" oninput="updateGarageRow(this)">
+                </div>
+              </div>
+              <div class="remise-zone">${formatClientRemiseBadge(rem)}</div>
+            </div>`;
+        });
+        document.getElementById("resultGarage").style.display = "block";
+      } catch (err) { alert("Erreur : " + err.message); }
+      finally { document.getElementById("loaderGarage").style.display = "none"; input.value = ""; }
+    });
+  }
+
+  async function saveGarageToSheet() {
+    const fournisseur = document.getElementById("garageFournisseur").value;
+    const items = [];
+    document.querySelectorAll("#garagePiecesContainer .piece-item").forEach(div => {
+      items.push({
+        id: div.querySelector(".g-id").value,
+        nom: div.querySelector(".g-nom").value,
+        prix_brut_ht: parseFloat(div.querySelector(".g-brut").value) || 0,
+        remise_fournisseur: parseFloat(div.querySelector(".g-rem").value) || 0,
+        prix_net_ht: parseFloat(div.querySelector(".g-net").value) || 0
+      });
+    });
+    try {
+      const res = await callApi({ action: "saveGaragePieces", fournisseur: fournisseur, pieces: items });
+      alert(`✅ ${res.added} pièce(s) ajoutée(s) à la liste d'import EBP !`);
+      document.getElementById("resultGarage").style.display = "none";
+      updateUI(res.status);
+    } catch (err) { alert("Erreur : " + err.message); }
+  }
+
+  async function triggerGarageExport() {
+    const btn = document.querySelector("#alertGarage button");
+    btn.innerText = "⏳ Génération du fichier EBP...";
+    btn.disabled = true;
+    try {
+      const res = await callApi({ action: "exportGarageEBP" });
+      refreshStatus();
+      const box = document.getElementById("exportResult");
+      box.innerHTML = `✅ Fichier <b>Import_EBP_Garage.xlsx</b> généré (${res.count} pièce(s)) !<br>
+        <a href="${res.downloadUrl}" target="_blank">⬇️ Télécharger pour EBP Méca Pro</a>`;
+      box.style.display = "block";
+    } catch (err) { alert("Erreur : " + err.message); }
+    finally { btn.disabled = false; btn.innerText = "📥 Générer Excel Import EBP"; }
   }
 </script>
 </body>
