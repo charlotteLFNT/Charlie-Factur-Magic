@@ -837,9 +837,14 @@
     try {
       const res = await callApi({ action: "exportGarageEBP" });
       const box = document.getElementById("exportResult");
-      box.innerHTML = `✅ Fichier <b>Import_EBP_Garage.csv</b> généré (${res.count} pièce(s)) !<br>
-        <a href="${res.downloadUrl}" target="_blank" onclick="confirmGarageDownload()">⬇️ Télécharger pour EBP Méca Pro</a>`;
+      box.innerHTML = `✅ Fichier <b>Import_EBP_Garage.csv</b> téléchargé (${res.count} pièce(s)) !`;
       box.style.display = "block";
+      const dlLink = document.createElement("a");
+      dlLink.href = res.downloadUrl;
+      dlLink.download = "Import_EBP_Garage.csv";
+      document.body.appendChild(dlLink);
+      dlLink.click();
+      document.body.removeChild(dlLink);
     } catch (err) { alert("Erreur : " + err.message); }
     finally { btn.disabled = false; btn.innerText = "📥 Générer CSV Import EBP"; }
   }
