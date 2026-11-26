@@ -813,8 +813,7 @@
                   <input type="number" step="0.01" class="g-net" value="${Number(p.prix_net_ht || 0).toFixed(2)}" oninput="updateGarageRow(this)">
                 </div>
               </div>
-              <div class="remise-zone">${formatClientRemiseBadge(rem)}</div>
-            </div>`;
+              </div>`;
         });
         document.getElementById("resultGarage").style.display = "block";
       } catch (err) { alert("Erreur : " + err.message); }
