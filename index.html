@@ -774,7 +774,7 @@
     const item = inputEl.closest(".piece-item");
     const brut = parseFloat(item.querySelector(".g-brut").value) || 0;
     const rem = parseFloat(item.querySelector(".g-rem").value) || 0;
-    if (inputEl.classList.contains("g-brut") || inputEl.classList.contains("g-rem")) {
+    if (inputEl.classList.contains("g-rem")) {
       item.querySelector(".g-net").value = (brut * (1 - rem / 100)).toFixed(2);
     }
   }
