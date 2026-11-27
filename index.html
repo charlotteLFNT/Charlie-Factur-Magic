@@ -107,6 +107,25 @@
     .scan-box.alt strong { color: #fff; }
     input[type="file"] { display: none; }
 
+    /* Cartes de choix accueil Laurent */
+    .choice-card {
+      background: var(--card); border: 2px solid #2b5869; border-radius: 16px;
+      padding: 22px 16px; margin-bottom: 14px; text-align: center; cursor: pointer;
+      transition: transform 0.1s, border-color 0.2s;
+    }
+    .choice-card:active { transform: scale(0.98); }
+    .choice-card.green { border-color: #66bb6a; }
+    .choice-card.gold { border-color: var(--accent); }
+    .choice-card .icon { font-size: 2.5rem; display: block; margin-bottom: 8px; }
+    .choice-card h3 { margin: 0 0 6px; font-size: 1.15rem; color: #fff; }
+    .choice-card p { margin: 0; font-size: 0.84rem; color: var(--muted); }
+
+    .btn-back {
+      background: #234e5e; color: #fff; border: 1px solid #2b5869; border-radius: 10px;
+      padding: 9px 14px; font-size: 0.88rem; font-weight: 700; cursor: pointer;
+      margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px;
+    }
+
     .card { background: var(--card); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
     .card-title { font-size: 0.92rem; font-weight: 700; color: var(--accent); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     label { display: block; font-size: 0.78rem; color: var(--muted); margin: 8px 0 4px; font-weight: 600; }
@@ -176,34 +195,33 @@
       border-radius: 6px; padding: 2px 7px; font-size: 0.75rem; cursor: pointer;
     }
 
-    /* Simulateur prix de revient */
-    .sim-box {
+    /* Carte recherche tarif + gain */
+    .search-result-card {
       background: #0c222b; border: 1px solid #2b5869; border-radius: 10px;
       padding: 12px; margin-top: 10px;
     }
+    .search-result-top {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    }
+    .search-result-top .ref { font-size: 0.75rem; color: var(--muted); font-weight: 700; }
+    .search-result-top .name { font-size: 0.94rem; color: #fff; font-weight: 600; margin-top: 2px; }
+    .search-result-top .price { font-size: 1.15rem; color: var(--accent); font-weight: 800; white-space: nowrap; }
+    .btn-gain {
+      background: #1b4859; color: #81c784; border: 1px solid #356c80; border-radius: 8px;
+      padding: 7px 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+      margin-top: 8px; width: 100%;
+    }
+    .gain-panel {
+      display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #2b5869;
+    }
     .sim-row {
       display: flex; justify-content: space-between; padding: 5px 0;
-      font-size: 0.88rem; border-bottom: 1px solid #163845;
+      font-size: 0.86rem; border-bottom: 1px solid #163845;
     }
     .sim-row:last-child { border-bottom: none; }
-    .sim-row.total-revient { font-weight: 700; color: var(--accent); font-size: 0.96rem; padding-top: 8px; }
-    .sim-row.marge-ok { font-weight: 700; color: #81c784; font-size: 0.96rem; }
-    .sim-row.marge-bad { font-weight: 700; color: #ff8a80; font-size: 0.96rem; }
-
-    .search-result-item {
-      background: #0c222b; border: 1px solid #2b5869; border-radius: 10px;
-      padding: 10px 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
-    }
-    .search-result-item .ref { font-size: 0.75rem; color: var(--muted); font-weight: 700; }
-    .search-result-item .name { font-size: 0.9rem; color: #fff; font-weight: 600; }
-    .search-result-item .price { font-size: 1.05rem; color: var(--accent); font-weight: 800; white-space: nowrap; }
-
-    .checkbox-row {
-      display: flex; align-items: center; justify-content: space-between;
-      background: #0c222b; padding: 10px 12px; border-radius: 10px; margin-top: 8px;
-      border: 1px solid #2b5869; cursor: pointer;
-    }
-    .checkbox-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: #66bb6a; }
+    .sim-row.total-revient { font-weight: 700; color: var(--accent); font-size: 0.92rem; padding-top: 7px; }
+    .sim-row.marge-ok { font-weight: 800; color: #81c784; font-size: 0.98rem; padding-top: 6px; }
+    .sim-row.marge-bad { font-weight: 800; color: #ff8a80; font-size: 0.98rem; padding-top: 6px; }
 
     .total-banner {
       background: linear-gradient(135deg, #1b4859, #0c222b); border: 2px solid #66bb6a;
@@ -220,11 +238,11 @@
       display: none; border-top: 1px solid #244b59; height: 68px; z-index: 50;
     }
     nav button {
-      flex: 1; background: none; border: none; color: var(--muted); font-size: 0.76rem;
+      flex: 1; background: none; border: none; color: var(--muted); font-size: 0.72rem;
       font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
     }
     nav button.active { color: var(--accent); background: rgba(245, 176, 39, 0.08); }
-    nav button span { font-size: 1.25rem; }
+    nav button span { font-size: 1.2rem; }
   </style>
 </head>
 <body>
@@ -394,38 +412,6 @@
     <!-- ONGLET 2 : PIECES LAURENT (ADMIN)                         -->
     <!-- ========================================================= -->
     <div id="tab-pieces" class="tab-content">
-
-      <!-- CALCULATEUR PRIX DE REVIENT & REMISE (À LA DEMANDE) -->
-      <div class="card">
-        <div class="card-title" style="margin-bottom:0; cursor:pointer;" onclick="toggleCostSimulator()">
-          <span>🧮 Calculateur prix de revient & remise</span>
-          <span id="simToggleIcon" style="font-size:0.85rem; color:var(--muted);">▼ Ouvrir</span>
-        </div>
-        <div id="costSimulatorBody" style="display:none; margin-top:10px;">
-          <label>Rechercher une pièce dans Base_Pièces</label>
-          <input type="text" id="simSearchInput" placeholder="Tape une référence ou un nom (ex: phare, 6005...)" oninput="filterSimPieces()">
-          <div id="simSearchResults" style="max-height:180px; overflow-y:auto;"></div>
-
-          <div id="simCalcPanel" class="sim-box" style="display:none;">
-            <div style="font-weight:700; color:#fff; margin-bottom:4px;" id="simSelectedName"></div>
-            <div style="font-size:0.75rem; color:var(--muted); margin-bottom:8px;" id="simSelectedRef"></div>
-
-            <label style="margin-top:0;">Remise accordée sur prix de vente (%)</label>
-            <input type="number" id="simRemiseInput" value="0" min="0" max="100" step="1" oninput="recalcCostSimulator()">
-
-            <div style="margin-top:10px;">
-              <div class="sim-row"><span>Prix d'achat (PA) :</span><strong id="simPA">0,00 €</strong></div>
-              <div class="sim-row"><span>Prix de vente catalogue :</span><span id="simPVCat">0,00 €</span></div>
-              <div class="sim-row"><span>Prix de vente après remise :</span><strong id="simPVNet" style="color:#fff;">0,00 €</strong></div>
-              <div class="sim-row"><span>Charges URSSAF + CFP (12,4 %) :</span><span id="simUrssaf">0,00 €</span></div>
-              <div class="sim-row total-revient"><span>Coût de revient total :</span><span id="simRevient">0,00 €</span></div>
-              <div class="sim-row" id="simMargeRow"><span>Marge nette dans sa poche :</span><span id="simMarge">0,00 €</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SCAN FACTURE FOURNISSEUR LAURENT -->
       <div class="scan-grid">
         <div class="scan-box" onclick="document.getElementById('camPieces').click()">
           <span>📷</span>
@@ -453,7 +439,109 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- ONGLET 3 : GARAGE MATEO / EBP (JEROME + CHARLIE)          -->
+    <!-- ONGLET 3 : RECHERCHE TARIFS & GAIN (LAURENT + CHARLIE)    -->
+    <!-- ========================================================= -->
+    <div id="tab-tarifs" class="tab-content">
+      <button id="btnBackFromTarifs" class="btn-back" style="display:none;" onclick="showLaurentMenu()">← Retour au menu</button>
+
+      <div class="card">
+        <div class="card-title" style="color:#81c784;">
+          <span>🔍 Recherche de tarif & gain pièce</span>
+        </div>
+        <input type="text" id="tarifSearchInput" placeholder="Tape une référence ou un nom (ex : phare, batterie, 6005...)" oninput="filterTarifsAndGain()">
+        <div id="tarifSearchResults"></div>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- ONGLET 4 : ACCUEIL LAURENT (MENU À 2 CHOIX)               -->
+    <!-- ========================================================= -->
+    <div id="tab-laurent-home" class="tab-content">
+      <div class="choice-card green" onclick="openLaurentEstimation()">
+        <span class="icon">🚜</span>
+        <h3>Estimation d'OR</h3>
+        <p>Prendre en photo le recto et le verso pour estimer le montant client et envoyer à Charlie</p>
+      </div>
+
+      <div class="choice-card gold" onclick="openLaurentTarifs()">
+        <span class="icon">🔍</span>
+        <h3>Recherche de prix & gain</h3>
+        <p>Vérifier le prix de vente d'une pièce et calculer le gain net après achat et charges</p>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- ONGLET 5 : ESTIMATION D'OR (LAURENT)                      -->
+    <!-- ========================================================= -->
+    <div id="tab-laurent-est" class="tab-content">
+      <button class="btn-back" onclick="showLaurentMenu()">← Retour au menu</button>
+
+      <div class="card">
+        <div class="card-title" style="color:#81c784;">
+          <span>🚜 Estimer un OR (Recto + Verso)</span>
+        </div>
+
+        <div class="row2">
+          <div class="scan-box laurent-border" style="padding:14px 8px;" onclick="document.getElementById('camLaurentRecto').click()">
+            <span style="font-size:1.6rem;">📷</span>
+            <strong style="font-size:0.85rem;">1. Photo Recto</strong>
+            <div id="statusLaurentRecto" style="font-size:0.72rem; color:var(--muted); margin-top:3px;">Travaux & heures</div>
+          </div>
+          <div class="scan-box laurent-border" style="padding:14px 8px;" onclick="document.getElementById('camLaurentVerso').click()">
+            <span style="font-size:1.6rem;">📷</span>
+            <strong style="font-size:0.85rem;">2. Photo Verso</strong>
+            <div id="statusLaurentVerso" style="font-size:0.72rem; color:var(--muted); margin-top:3px;">Pièces, dép., fourn.</div>
+          </div>
+        </div>
+        <input type="file" id="camLaurentRecto" accept="image/*" capture="environment" onchange="handleLaurentRecto(this)">
+        <input type="file" id="camLaurentVerso" accept="image/*" capture="environment" onchange="handleLaurentVerso(this)">
+
+        <div id="loaderLaurentEst" class="loader" style="color:#81c784;">🪄 Analyse de la photo en cours...</div>
+
+        <div style="margin-top:10px;">
+          <div class="row2">
+            <div>
+              <label>Client</label>
+              <input type="text" id="lClient" placeholder="Nom du client">
+            </div>
+            <div>
+              <label>Date</label>
+              <input type="text" id="lDate" placeholder="JJ/MM/AAAA">
+            </div>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label>Engin / Matériel</label>
+              <input type="text" id="lEngin" placeholder="Tracteur / Machine">
+            </div>
+            <div>
+              <label>Heures Main-d'œuvre (<span id="lblTarifMO">--</span> €/h)</label>
+              <input type="number" id="lHeuresMO" step="0.25" value="0" oninput="recalcLaurentEstimation()">
+            </div>
+          </div>
+
+          <div class="verso-section">
+            <div class="verso-line-header">
+              <strong style="color:#fff;">Pièces, déplacement & fournitures</strong>
+              <button type="button" class="btn btn-secondary btn-small" style="width:auto; margin:0;" onclick="addLaurentPieceLine()">+ Ajouter une ligne</button>
+            </div>
+            <div id="laurentEstPiecesContainer"></div>
+          </div>
+
+          <div class="total-banner">
+            <div class="lbl">Estimation totale à payer par le client</div>
+            <div class="amount" id="lTotalEstime">0,00 €</div>
+            <div class="sub">TVA non applicable (art. 293 B du CGI)</div>
+          </div>
+
+          <button class="btn btn-laurent" id="btnSendToCharlie" onclick="sendORToCharlie()">📤 Envoyer cet OR à Charlie pour facturation</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- ONGLET 6 : GARAGE MATEO / EBP (JEROME + CHARLIE)          -->
     <!-- ========================================================= -->
     <div id="tab-garage" class="tab-content">
       <div class="scan-grid">
@@ -485,100 +573,12 @@
       </div>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- ONGLET 4 : ESPACE LAURENT (TARIFS & ESTIMATION OR)        -->
-    <!-- ========================================================= -->
-    <div id="tab-laurent" class="tab-content">
-
-      <!-- 1. RECHERCHE EXPRESS DE PRIX -->
-      <div class="card">
-        <div class="card-title" style="color:#81c784;">
-          <span>🔍 Recherche express de tarif</span>
-        </div>
-        <input type="text" id="laurentSearchInput" placeholder="Ex : batterie, phare de travail, 6005..." oninput="filterLaurentTarifs()">
-        <div id="laurentSearchResults" style="max-height:220px; overflow-y:auto;"></div>
-      </div>
-
-      <!-- 2. ESTIMATION CLIENT OR (RECTO + VERSO) -->
-      <div class="card">
-        <div class="card-title" style="color:#81c784;">
-          <span>🚜 Estimer un OR (Recto + Verso)</span>
-        </div>
-
-        <div class="row2">
-          <div class="scan-box laurent-border" style="padding:14px 8px;" onclick="document.getElementById('camLaurentRecto').click()">
-            <span style="font-size:1.6rem;">📷</span>
-            <strong style="font-size:0.85rem;">1. Photo Recto</strong>
-            <div id="statusLaurentRecto" style="font-size:0.72rem; color:var(--muted); margin-top:3px;">Travaux & heures</div>
-          </div>
-          <div class="scan-box laurent-border" style="padding:14px 8px;" onclick="document.getElementById('camLaurentVerso').click()">
-            <span style="font-size:1.6rem;">📷</span>
-            <strong style="font-size:0.85rem;">2. Photo Verso</strong>
-            <div id="statusLaurentVerso" style="font-size:0.72rem; color:var(--muted); margin-top:3px;">Liste des pièces</div>
-          </div>
-        </div>
-        <input type="file" id="camLaurentRecto" accept="image/*" capture="environment" onchange="handleLaurentRecto(this)">
-        <input type="file" id="camLaurentVerso" accept="image/*" capture="environment" onchange="handleLaurentVerso(this)">
-
-        <div id="loaderLaurentEst" class="loader" style="color:#81c784;">🪄 Analyse de la photo en cours...</div>
-
-        <div style="margin-top:10px;">
-          <div class="row2">
-            <div>
-              <label>Client</label>
-              <input type="text" id="lClient" placeholder="Nom du client">
-            </div>
-            <div>
-              <label>Date</label>
-              <input type="text" id="lDate" placeholder="JJ/MM/AAAA">
-            </div>
-          </div>
-
-          <div class="row2">
-            <div>
-              <label>Engin / Matériel</label>
-              <input type="text" id="lEngin" placeholder="Tracteur / Machine">
-            </div>
-            <div>
-              <label>Heures Main-d'œuvre (<span id="lblTarifMO">--</span> €/h)</label>
-              <input type="number" id="lHeuresMO" step="0.25" value="0" oninput="recalcLaurentEstimation()">
-            </div>
-          </div>
-
-          <label class="checkbox-row" for="chkDeplacement">
-            <span>🚚 Forfait déplacement (<strong id="lblTarifDep">--</strong> €)</span>
-            <input type="checkbox" id="chkDeplacement" onchange="recalcLaurentEstimation()">
-          </label>
-
-          <label class="checkbox-row" for="chkFournitures">
-            <span>🧰 Forfait petites fournitures (<strong id="lblTarifFourn">--</strong> €)</span>
-            <input type="checkbox" id="chkFournitures" onchange="recalcLaurentEstimation()">
-          </label>
-
-          <div class="verso-section">
-            <div class="verso-line-header">
-              <strong style="color:#fff;">Pièces utilisées</strong>
-              <button type="button" class="btn btn-secondary btn-small" style="width:auto; margin:0;" onclick="addLaurentPieceLine()">+ Ajouter une pièce</button>
-            </div>
-            <div id="laurentEstPiecesContainer"></div>
-          </div>
-
-          <div class="total-banner">
-            <div class="lbl">Estimation totale à payer par le client</div>
-            <div class="amount" id="lTotalEstime">0,00 €</div>
-            <div class="sub">TVA non applicable (art. 293 B du CGI)</div>
-          </div>
-
-          <button class="btn btn-laurent" id="btnSendToCharlie" onclick="sendORToCharlie()">📤 Envoyer cet OR à Charlie pour facturation</button>
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <nav id="bottomNav">
     <button id="nav-or" onclick="switchTab('or')"><span>📋</span>OR Laurent</button>
     <button id="nav-pieces" onclick="switchTab('pieces')"><span>🚜</span>Pièces Laurent</button>
+    <button id="nav-tarifs" onclick="switchTab('tarifs')"><span>🔍</span>Tarifs</button>
     <button id="nav-garage" onclick="switchTab('garage')"><span>🔧</span>Garage EBP</button>
   </nav>
 </div>
@@ -591,7 +591,6 @@
   let pinBuffer = "";
   let currentArchivedORs = [];
   let laurentCatalog = [];
-  let selectedSimPiece = null;
   let laurentRectoCache = { heures_engin: "", texte_brut: "", texte_facture: "" };
   let deferredPrompt = null;
 
@@ -671,19 +670,31 @@
 
     const nav = document.getElementById("bottomNav");
     if (user.role === "ADMIN") {
-      document.getElementById("nav-or").style.display = "flex";
-      document.getElementById("nav-pieces").style.display = "flex";
-      document.getElementById("nav-garage").style.display = "flex";
+      document.getElementById("btnBackFromTarifs").style.display = "none";
       nav.style.display = "flex";
       switchTab("or");
     } else if (user.role === "LAURENT") {
+      document.getElementById("btnBackFromTarifs").style.display = "inline-flex";
       nav.style.display = "none";
-      switchTab("laurent");
+      showLaurentMenu();
     } else {
       nav.style.display = "none";
       switchTab("garage");
     }
     updateUI(status);
+  }
+
+  function showLaurentMenu() {
+    switchTab("laurent-home");
+  }
+
+  function openLaurentEstimation() {
+    switchTab("laurent-est");
+  }
+
+  function openLaurentTarifs() {
+    switchTab("tarifs");
+    document.getElementById("tarifSearchInput").focus();
   }
 
   function logout() {
@@ -760,8 +771,6 @@
     if (status.laurentPieces && status.laurentPieces.length > 0) {
       laurentCatalog = status.laurentPieces;
       document.getElementById("lblTarifMO").innerText = getSpecialTarif("MO").toFixed(2);
-      document.getElementById("lblTarifDep").innerText = getSpecialTarif("Déplacement1").toFixed(2);
-      document.getElementById("lblTarifFourn").innerText = getSpecialTarif("FOURN").toFixed(2);
       recalcLaurentEstimation();
     }
 
@@ -820,6 +829,7 @@
     const navBtn = document.getElementById("nav-" + tab);
     if (navBtn) navBtn.classList.add("active");
     document.getElementById("exportResult").style.display = "none";
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function prepareFile(file, callback) {
@@ -860,13 +870,11 @@
     const desN = normalizeStr(desLue);
     if (!refN && !desN) return [];
 
-    // 1. Correspondance exacte sur la référence
     if (refN) {
       const exact = laurentCatalog.filter(p => normalizeStr(p.id) === refN);
       if (exact.length > 0) return exact;
     }
 
-    // 2. Correspondance partielle sur référence ou désignation
     return laurentCatalog.filter(p => {
       const pId = normalizeStr(p.id);
       const pNom = normalizeStr(p.nom);
@@ -877,14 +885,87 @@
   }
 
   // =========================================================
+  // MODULE PARTAGÉ : RECHERCHE DE TARIF & GAIN PIÈCE
+  // =========================================================
+  function filterTarifsAndGain() {
+    const q = normalizeStr(document.getElementById("tarifSearchInput").value);
+    const box = document.getElementById("tarifSearchResults");
+    box.innerHTML = "";
+    if (q.length < 2) return;
+
+    const matches = laurentCatalog.filter(p =>
+      normalizeStr(p.id).includes(q) || normalizeStr(p.nom).includes(q)
+    ).slice(0, 25);
+
+    if (matches.length === 0) {
+      box.innerHTML = `<div style="font-size:0.84rem; color:var(--muted); padding:10px 4px;">Aucune pièce trouvée dans la base.</div>`;
+      return;
+    }
+
+    matches.forEach((p, idx) => {
+      const card = document.createElement("div");
+      card.className = "search-result-card";
+      card.innerHTML = `
+        <div class="search-result-top">
+          <div style="flex:1; min-width:0;">
+            <div class="ref">${p.id}${p.fournisseur ? " • " + p.fournisseur : ""}</div>
+            <div class="name">${p.nom}</div>
+          </div>
+          <div class="price">${p.pv.toFixed(2)} €</div>
+        </div>
+        <button type="button" class="btn-gain" onclick="toggleGainPanel(this, ${p.pa_ht}, ${p.pv})">💰 Voir le gain & simuler remise</button>
+        <div class="gain-panel">
+          <label style="margin-top:0;">Remise éventuelle sur prix de vente (%)</label>
+          <input type="number" class="gain-remise-input" value="0" min="0" max="100" step="1" oninput="updateGainPanel(this, ${p.pa_ht}, ${p.pv})">
+          <div style="margin-top:8px;">
+            <div class="sim-row"><span>Prix d'achat (PA) :</span><strong>${p.pa_ht.toFixed(2)} €</strong></div>
+            <div class="sim-row"><span>Prix de vente après remise :</span><strong class="gp-pv-net">${p.pv.toFixed(2)} €</strong></div>
+            <div class="sim-row"><span>Charges URSSAF + CFP (12,4 %) :</span><span class="gp-urssaf">0,00 €</span></div>
+            <div class="sim-row total-revient"><span>Coût de revient total :</span><span class="gp-revient">0,00 €</span></div>
+            <div class="sim-row gp-marge-row marge-ok"><span>Gain net dans ta poche :</span><span class="gp-marge">0,00 €</span></div>
+          </div>
+        </div>
+      `;
+      box.appendChild(card);
+    });
+  }
+
+  function toggleGainPanel(btn, pa, pvCat) {
+    const panel = btn.nextElementSibling;
+    const isHidden = panel.style.display === "" || panel.style.display === "none";
+    panel.style.display = isHidden ? "block" : "none";
+    btn.innerText = isHidden ? "▲ Masquer le détail du gain" : "💰 Voir le gain & simuler remise";
+    if (isHidden) {
+      const inp = panel.querySelector(".gain-remise-input");
+      updateGainPanel(inp, pa, pvCat);
+    }
+  }
+
+  function updateGainPanel(inputEl, pa, pvCat) {
+    const panel = inputEl.closest(".gain-panel");
+    const remisePct = Math.max(0, Math.min(100, parseFloat(inputEl.value) || 0));
+
+    const pvRemise = Math.round(pvCat * (1 - remisePct / 100) * 100) / 100;
+    const urssaf = Math.round(pvRemise * URSSAF_RATE * 100) / 100;
+    const revient = Math.round((pa + urssaf) * 100) / 100;
+    const gain = Math.round((pvRemise - revient) * 100) / 100;
+
+    panel.querySelector(".gp-pv-net").innerText = pvRemise.toFixed(2) + " €";
+    panel.querySelector(".gp-urssaf").innerText = urssaf.toFixed(2) + " €";
+    panel.querySelector(".gp-revient").innerText = revient.toFixed(2) + " €";
+
+    const margeRow = panel.querySelector(".gp-marge-row");
+    margeRow.className = "sim-row gp-marge-row " + (gain >= 0 ? "marge-ok" : "marge-bad");
+    panel.querySelector(".gp-marge").innerText = (gain >= 0 ? "+" : "") + gain.toFixed(2) + " €";
+  }
+
+  // =========================================================
   // FONCTIONS ADMIN : OR LAURENT (RECTO + VERSO)
   // =========================================================
   function renderAdminVersoLines(lines) {
     const container = document.getElementById("adminVersoContainer");
     container.innerHTML = "";
-    (lines || []).forEach(item => {
-      addAdminVersoLine(item);
-    });
+    (lines || []).forEach(item => addAdminVersoLine(item));
   }
 
   function addAdminVersoLine(prefill = null) {
@@ -1061,75 +1142,8 @@
   }
 
   // =========================================================
-  // FONCTIONS ADMIN : PIECES LAURENT + SIMULATEUR REVIENT
+  // FONCTIONS ADMIN : PIECES LAURENT (SCAN BL / FACTURE)
   // =========================================================
-  function toggleCostSimulator() {
-    const body = document.getElementById("costSimulatorBody");
-    const icon = document.getElementById("simToggleIcon");
-    const isHidden = body.style.display === "none";
-    body.style.display = isHidden ? "block" : "none";
-    icon.innerText = isHidden ? "▲ Fermer" : "▼ Ouvrir";
-  }
-
-  function filterSimPieces() {
-    const q = normalizeStr(document.getElementById("simSearchInput").value);
-    const box = document.getElementById("simSearchResults");
-    box.innerHTML = "";
-    if (q.length < 2) return;
-
-    const matches = laurentCatalog.filter(p =>
-      normalizeStr(p.id).includes(q) || normalizeStr(p.nom).includes(q)
-    ).slice(0, 15);
-
-    matches.forEach(p => {
-      const div = document.createElement("div");
-      div.className = "search-result-item";
-      div.style.cursor = "pointer";
-      div.innerHTML = `
-        <div>
-          <div class="ref">${p.id}</div>
-          <div class="name">${p.nom}</div>
-        </div>
-        <div class="price">${p.pv.toFixed(2)} €</div>
-      `;
-      div.onclick = () => selectSimPiece(p);
-      box.appendChild(div);
-    });
-  }
-
-  function selectSimPiece(piece) {
-    selectedSimPiece = piece;
-    document.getElementById("simSearchResults").innerHTML = "";
-    document.getElementById("simSearchInput").value = piece.nom;
-    document.getElementById("simSelectedName").innerText = piece.nom;
-    document.getElementById("simSelectedRef").innerText = "Réf : " + piece.id + (piece.fournisseur ? " (" + piece.fournisseur + ")" : "");
-    document.getElementById("simRemiseInput").value = 0;
-    document.getElementById("simCalcPanel").style.display = "block";
-    recalcCostSimulator();
-  }
-
-  function recalcCostSimulator() {
-    if (!selectedSimPiece) return;
-    const pa = Number(selectedSimPiece.pa_ht || 0);
-    const pvCat = Number(selectedSimPiece.pv || 0);
-    const remisePct = Math.max(0, Math.min(100, parseFloat(document.getElementById("simRemiseInput").value) || 0));
-
-    const pvRemise = Math.round(pvCat * (1 - remisePct / 100) * 100) / 100;
-    const urssaf = Math.round(pvRemise * URSSAF_RATE * 100) / 100;
-    const revient = Math.round((pa + urssaf) * 100) / 100;
-    const marge = Math.round((pvRemise - revient) * 100) / 100;
-
-    document.getElementById("simPA").innerText = pa.toFixed(2) + " €";
-    document.getElementById("simPVCat").innerText = pvCat.toFixed(2) + " €";
-    document.getElementById("simPVNet").innerText = pvRemise.toFixed(2) + " €";
-    document.getElementById("simUrssaf").innerText = urssaf.toFixed(2) + " €";
-    document.getElementById("simRevient").innerText = revient.toFixed(2) + " €";
-
-    const margeRow = document.getElementById("simMargeRow");
-    margeRow.className = "sim-row " + (marge >= 0 ? "marge-ok" : "marge-bad");
-    document.getElementById("simMarge").innerText = (marge >= 0 ? "+" : "") + marge.toFixed(2) + " €";
-  }
-
   function handlePiecesFile(input) {
     if (!input.files[0]) return;
     document.getElementById("loaderPieces").style.display = "block";
@@ -1194,40 +1208,8 @@
   }
 
   // =========================================================
-  // FONCTIONS ESPACE LAURENT (RECHERCHE PRIX + ESTIMATION OR)
+  // FONCTIONS ESPACE LAURENT : ESTIMATION D'OR RECTO + VERSO
   // =========================================================
-  function filterLaurentTarifs() {
-    const q = normalizeStr(document.getElementById("laurentSearchInput").value);
-    const box = document.getElementById("laurentSearchResults");
-    box.innerHTML = "";
-    if (q.length < 2) return;
-
-    const matches = laurentCatalog.filter(p =>
-      normalizeStr(p.id).includes(q) || normalizeStr(p.nom).includes(q)
-    ).slice(0, 20);
-
-    if (matches.length === 0) {
-      box.innerHTML = `<div style="font-size:0.82rem; color:var(--muted); padding:8px;">Aucune pièce trouvée.</div>`;
-      return;
-    }
-
-    matches.forEach(p => {
-      const div = document.createElement("div");
-      div.className = "search-result-item";
-      div.innerHTML = `
-        <div style="flex:1; min-width:0;">
-          <div class="ref">${p.id}</div>
-          <div class="name">${p.nom}</div>
-        </div>
-        <div style="text-align:right;">
-          <div class="price">${p.pv.toFixed(2)} €</div>
-          <button type="button" class="btn btn-secondary" style="padding:3px 8px; font-size:0.72rem; margin-top:4px; width:auto;" onclick='addLaurentPieceLine(${JSON.stringify({ id: p.id, nom: p.nom, pv: p.pv, qte: 1, matched: true })})'>+ OR</button>
-        </div>
-      `;
-      box.appendChild(div);
-    });
-  }
-
   function handleLaurentRecto(input) {
     if (!input.files[0]) return;
     document.getElementById("loaderLaurentEst").style.display = "block";
@@ -1262,7 +1244,7 @@
         const container = document.getElementById("laurentEstPiecesContainer");
         container.innerHTML = "";
         (res.pieces || []).forEach(p => addLaurentPieceLine(p));
-        document.getElementById("statusLaurentVerso").innerText = "✅ " + (res.pieces || []).length + " pièce(s) lue(s)";
+        document.getElementById("statusLaurentVerso").innerText = "✅ " + (res.pieces || []).length + " ligne(s) lue(s)";
         document.getElementById("statusLaurentVerso").style.color = "#81c784";
         recalcLaurentEstimation();
       } catch (err) { alert("Erreur : " + err.message); }
@@ -1335,14 +1317,8 @@
 
   function recalcLaurentEstimation() {
     const tarifMO = getSpecialTarif("MO");
-    const tarifDep = getSpecialTarif("Déplacement1");
-    const tarifFourn = getSpecialTarif("FOURN");
-
     const heuresMO = parseFloat(document.getElementById("lHeuresMO").value) || 0;
     let total = heuresMO * tarifMO;
-
-    if (document.getElementById("chkDeplacement").checked) total += tarifDep;
-    if (document.getElementById("chkFournitures").checked) total += tarifFourn;
 
     document.querySelectorAll("#laurentEstPiecesContainer .piece-item").forEach(div => {
       const qte = parseFloat(div.querySelector(".le-qte").value) || 0;
@@ -1369,13 +1345,6 @@
       });
     });
 
-    if (document.getElementById("chkDeplacement").checked) {
-      pieces.push({ id: "Déplacement1", nom: "Forfait déplacement", qte: 1, pv: getSpecialTarif("Déplacement1"), matched: true });
-    }
-    if (document.getElementById("chkFournitures").checked) {
-      pieces.push({ id: "FOURN", nom: "Forfait petites fournitures", qte: 1, pv: getSpecialTarif("FOURN"), matched: true });
-    }
-
     try {
       await callApi({
         action: "saveOR",
@@ -1396,11 +1365,9 @@
       document.getElementById("lClient").value = "";
       document.getElementById("lEngin").value = "";
       document.getElementById("lHeuresMO").value = 0;
-      document.getElementById("chkDeplacement").checked = false;
-      document.getElementById("chkFournitures").checked = false;
       document.getElementById("statusLaurentRecto").innerText = "Travaux & heures";
       document.getElementById("statusLaurentRecto").style.color = "var(--muted)";
-      document.getElementById("statusLaurentVerso").innerText = "Liste des pièces";
+      document.getElementById("statusLaurentVerso").innerText = "Pièces, dép., fourn.";
       document.getElementById("statusLaurentVerso").style.color = "var(--muted)";
       recalcLaurentEstimation();
     } catch (err) {
