@@ -12,7 +12,7 @@
     :root {
       --bg: #0f2933; --card: #163845; --accent: #f5b027;
       --text: #ffffff; --muted: #9ec0cc; --alert: #e65100; --ok: #2e7d32; --danger: #c62828;
-      --garage: #0288d1;
+      --garage: #0288d1; --laurent: #43a047;
     }
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 85px; }
@@ -95,20 +95,22 @@
     .scan-grid { display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 10px; margin-bottom: 14px; }
     .scan-box {
       background: var(--card); border: 2px dashed var(--accent); border-radius: 16px;
-      padding: 20px 10px; text-align: center; cursor: pointer;
+      padding: 18px 10px; text-align: center; cursor: pointer;
     }
     .scan-box.garage-border { border-color: #4fc3f7; }
+    .scan-box.laurent-border { border-color: #81c784; }
     .scan-box.alt { border-style: solid; border-color: #2b5869; }
-    .scan-box span { font-size: 2rem; display: block; margin-bottom: 6px; }
-    .scan-box strong { color: var(--accent); font-size: 0.95rem; display: block; }
+    .scan-box span { font-size: 1.8rem; display: block; margin-bottom: 5px; }
+    .scan-box strong { color: var(--accent); font-size: 0.92rem; display: block; }
     .scan-box.garage-border strong { color: #4fc3f7; }
+    .scan-box.laurent-border strong { color: #81c784; }
     .scan-box.alt strong { color: #fff; }
     input[type="file"] { display: none; }
 
     .card { background: var(--card); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
-    .card-title { font-size: 0.9rem; font-weight: 700; color: var(--accent); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .card-title { font-size: 0.92rem; font-weight: 700; color: var(--accent); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     label { display: block; font-size: 0.78rem; color: var(--muted); margin: 8px 0 4px; font-weight: 600; }
-    input[type="text"], input[type="number"], textarea {
+    input[type="text"], input[type="number"], textarea, select {
       width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2b5869;
       background: #0c222b; color: #fff; font-size: 0.95rem;
     }
@@ -127,20 +129,27 @@
 
     .btn {
       width: 100%; padding: 13px; border: none; border-radius: 10px; font-weight: 700;
-      font-size: 0.98rem; cursor: pointer; margin-top: 10px;
+      font-size: 0.96rem; cursor: pointer; margin-top: 10px;
     }
     .btn-primary { background: var(--accent); color: #0a1d24; }
     .btn-garage { background: #4fc3f7; color: #0a1d24; }
+    .btn-laurent { background: #66bb6a; color: #0a1d24; }
     .btn-secondary { background: #265363; color: #fff; }
+    .btn-small { padding: 8px 12px; font-size: 0.84rem; margin-top: 6px; }
 
     .or-list-item {
       background: #0c222b; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
       display: flex; justify-content: space-between; align-items: center; gap: 10px;
       border-left: 3px solid var(--accent);
     }
+    .or-list-item.from-laurent { border-left-color: #66bb6a; }
     .or-list-info { flex: 1; cursor: pointer; }
     .or-list-info .top-line { font-weight: 700; font-size: 0.92rem; color: #fff; }
     .or-list-info .sub-line { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .badge-src {
+      display: inline-block; background: #2e7d32; color: #fff; font-size: 0.68rem;
+      padding: 2px 6px; border-radius: 6px; margin-left: 6px; vertical-align: middle;
+    }
     .btn-del {
       background: var(--danger); color: #fff; border: none; border-radius: 8px;
       padding: 7px 11px; font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap;
@@ -151,16 +160,67 @@
       border-left: 3px solid var(--accent);
     }
     .piece-item.garage-item { border-left-color: #4fc3f7; }
+    .piece-item.matched-item { border-left-color: #66bb6a; }
+    .piece-item.unmatched-item { border-left-color: #ff9800; }
     .piece-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 6px; margin-top: 6px; }
 
-    .loader { display: none; text-align: center; padding: 20px; color: var(--accent); font-weight: 600; }
+    .verso-section {
+      margin-top: 14px; padding-top: 12px; border-top: 1px dashed #2b5869;
+    }
+    .verso-line-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.78rem; color: var(--muted); margin-bottom: 6px;
+    }
+    .btn-remove-line {
+      background: transparent; border: 1px solid #c62828; color: #ff8a80;
+      border-radius: 6px; padding: 2px 7px; font-size: 0.75rem; cursor: pointer;
+    }
+
+    /* Simulateur prix de revient */
+    .sim-box {
+      background: #0c222b; border: 1px solid #2b5869; border-radius: 10px;
+      padding: 12px; margin-top: 10px;
+    }
+    .sim-row {
+      display: flex; justify-content: space-between; padding: 5px 0;
+      font-size: 0.88rem; border-bottom: 1px solid #163845;
+    }
+    .sim-row:last-child { border-bottom: none; }
+    .sim-row.total-revient { font-weight: 700; color: var(--accent); font-size: 0.96rem; padding-top: 8px; }
+    .sim-row.marge-ok { font-weight: 700; color: #81c784; font-size: 0.96rem; }
+    .sim-row.marge-bad { font-weight: 700; color: #ff8a80; font-size: 0.96rem; }
+
+    .search-result-item {
+      background: #0c222b; border: 1px solid #2b5869; border-radius: 10px;
+      padding: 10px 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    }
+    .search-result-item .ref { font-size: 0.75rem; color: var(--muted); font-weight: 700; }
+    .search-result-item .name { font-size: 0.9rem; color: #fff; font-weight: 600; }
+    .search-result-item .price { font-size: 1.05rem; color: var(--accent); font-weight: 800; white-space: nowrap; }
+
+    .checkbox-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #0c222b; padding: 10px 12px; border-radius: 10px; margin-top: 8px;
+      border: 1px solid #2b5869; cursor: pointer;
+    }
+    .checkbox-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: #66bb6a; }
+
+    .total-banner {
+      background: linear-gradient(135deg, #1b4859, #0c222b); border: 2px solid #66bb6a;
+      border-radius: 14px; padding: 14px; text-align: center; margin-top: 14px;
+    }
+    .total-banner .lbl { font-size: 0.82rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .total-banner .amount { font-size: 1.9rem; font-weight: 800; color: #81c784; margin: 4px 0; }
+    .total-banner .sub { font-size: 0.74rem; color: var(--muted); }
+
+    .loader { display: none; text-align: center; padding: 18px; color: var(--accent); font-weight: 600; }
 
     nav {
       position: fixed; bottom: 0; left: 0; right: 0; background: #0a1d24;
-      display: none; border-top: 1px solid #244b59; height: 68px;
+      display: none; border-top: 1px solid #244b59; height: 68px; z-index: 50;
     }
     nav button {
-      flex: 1; background: none; border: none; color: var(--muted); font-size: 0.78rem;
+      flex: 1; background: none; border: none; color: var(--muted); font-size: 0.76rem;
       font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
     }
     nav button.active { color: var(--accent); background: rgba(245, 176, 39, 0.08); }
@@ -228,13 +288,16 @@
   <div id="exportResult"></div>
 
   <div class="container">
-    <!-- ONGLET 1 : OR LAURENT (ADMIN) -->
+
+    <!-- ========================================================= -->
+    <!-- ONGLET 1 : OR LAURENT (ADMIN)                             -->
+    <!-- ========================================================= -->
     <div id="tab-or" class="tab-content">
       <div class="scan-grid">
         <div class="scan-box" onclick="document.getElementById('camOR').click()">
           <span>📷</span>
-          <strong>Photo OR</strong>
-          <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Appareil photo</div>
+          <strong>Photo Recto OR</strong>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">Travaux & heures</div>
         </div>
         <div class="scan-box alt" onclick="document.getElementById('galOR').click()">
           <span>📄</span>
@@ -245,7 +308,7 @@
       <input type="file" id="camOR" accept="image/*" capture="environment" onchange="handleORFile(this)">
       <input type="file" id="galOR" accept="image/*,application/pdf" onchange="handleORFile(this)">
 
-      <div id="loaderOR" class="loader">🪄 Lecture et mise en forme de l'OR en cours...</div>
+      <div id="loaderOR" class="loader">🪄 Lecture et mise en forme du recto de l'OR...</div>
 
       <div id="resultOR" class="card" style="display:none;">
         <div class="row2">
@@ -290,7 +353,31 @@
         </div>
         <input type="hidden" id="orTexteBrut">
 
-        <button class="btn btn-primary" onclick="copyORText()">📋 Copier tout le bloc pour Pennylane</button>
+        <button class="btn btn-primary" onclick="copyORText()">📋 Copier tout le bloc travaux pour Pennylane</button>
+
+        <!-- BLOC VERSO DE L'OR (PIÈCES À FACTURER) -->
+        <div class="verso-section">
+          <div class="card-title">
+            <span>🔩 Pièces utilisées (Verso de l'OR)</span>
+            <button type="button" class="btn btn-secondary btn-small" style="width:auto; margin:0;" onclick="addAdminVersoLine()">+ Ligne</button>
+          </div>
+          <div class="scan-grid" style="margin-bottom:8px;">
+            <div class="scan-box" style="padding:12px 8px;" onclick="document.getElementById('camORVerso').click()">
+              <span style="font-size:1.4rem;">📷</span>
+              <strong style="font-size:0.85rem;">Scanner Verso OR</strong>
+            </div>
+            <div class="scan-box alt" style="padding:12px 8px;" onclick="document.getElementById('galORVerso').click()">
+              <span style="font-size:1.4rem;">📄</span>
+              <strong style="font-size:0.85rem;">Fichier Verso</strong>
+            </div>
+          </div>
+          <input type="file" id="camORVerso" accept="image/*" capture="environment" onchange="handleAdminVersoFile(this)">
+          <input type="file" id="galORVerso" accept="image/*,application/pdf" onchange="handleAdminVersoFile(this)">
+
+          <div id="loaderORVerso" class="loader" style="padding:10px;">🔍 Lecture des pièces manuscrites du verso...</div>
+          <div id="adminVersoContainer"></div>
+        </div>
+
         <button class="btn btn-secondary" id="btnSaveOR" onclick="saveORToSheet()">💾 Archiver dans Historique_OR</button>
       </div>
 
@@ -303,8 +390,42 @@
       </div>
     </div>
 
-    <!-- ONGLET 2 : PIECES LAURENT (ADMIN) -->
+    <!-- ========================================================= -->
+    <!-- ONGLET 2 : PIECES LAURENT (ADMIN)                         -->
+    <!-- ========================================================= -->
     <div id="tab-pieces" class="tab-content">
+
+      <!-- CALCULATEUR PRIX DE REVIENT & REMISE (À LA DEMANDE) -->
+      <div class="card">
+        <div class="card-title" style="margin-bottom:0; cursor:pointer;" onclick="toggleCostSimulator()">
+          <span>🧮 Calculateur prix de revient & remise</span>
+          <span id="simToggleIcon" style="font-size:0.85rem; color:var(--muted);">▼ Ouvrir</span>
+        </div>
+        <div id="costSimulatorBody" style="display:none; margin-top:10px;">
+          <label>Rechercher une pièce dans Base_Pièces</label>
+          <input type="text" id="simSearchInput" placeholder="Tape une référence ou un nom (ex: phare, 6005...)" oninput="filterSimPieces()">
+          <div id="simSearchResults" style="max-height:180px; overflow-y:auto;"></div>
+
+          <div id="simCalcPanel" class="sim-box" style="display:none;">
+            <div style="font-weight:700; color:#fff; margin-bottom:4px;" id="simSelectedName"></div>
+            <div style="font-size:0.75rem; color:var(--muted); margin-bottom:8px;" id="simSelectedRef"></div>
+
+            <label style="margin-top:0;">Remise accordée sur prix de vente (%)</label>
+            <input type="number" id="simRemiseInput" value="0" min="0" max="100" step="1" oninput="recalcCostSimulator()">
+
+            <div style="margin-top:10px;">
+              <div class="sim-row"><span>Prix d'achat (PA) :</span><strong id="simPA">0,00 €</strong></div>
+              <div class="sim-row"><span>Prix de vente catalogue :</span><span id="simPVCat">0,00 €</span></div>
+              <div class="sim-row"><span>Prix de vente après remise :</span><strong id="simPVNet" style="color:#fff;">0,00 €</strong></div>
+              <div class="sim-row"><span>Charges URSSAF + CFP (12,4 %) :</span><span id="simUrssaf">0,00 €</span></div>
+              <div class="sim-row total-revient"><span>Coût de revient total :</span><span id="simRevient">0,00 €</span></div>
+              <div class="sim-row" id="simMargeRow"><span>Marge nette dans sa poche :</span><span id="simMarge">0,00 €</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCAN FACTURE FOURNISSEUR LAURENT -->
       <div class="scan-grid">
         <div class="scan-box" onclick="document.getElementById('camPieces').click()">
           <span>📷</span>
@@ -331,7 +452,9 @@
       </div>
     </div>
 
-    <!-- ONGLET 3 : GARAGE MATEO / EBP (JEROME + CHARLIE) -->
+    <!-- ========================================================= -->
+    <!-- ONGLET 3 : GARAGE MATEO / EBP (JEROME + CHARLIE)          -->
+    <!-- ========================================================= -->
     <div id="tab-garage" class="tab-content">
       <div class="scan-grid">
         <div class="scan-box garage-border" onclick="document.getElementById('camGarage').click()">
@@ -361,6 +484,96 @@
         <button class="btn btn-garage" onclick="saveGarageToSheet()">✅ Valider pour Import EBP</button>
       </div>
     </div>
+
+    <!-- ========================================================= -->
+    <!-- ONGLET 4 : ESPACE LAURENT (TARIFS & ESTIMATION OR)        -->
+    <!-- ========================================================= -->
+    <div id="tab-laurent" class="tab-content">
+
+      <!-- 1. RECHERCHE EXPRESS DE PRIX -->
+      <div class="card">
+        <div class="card-title" style="color:#81c784;">
+          <span>🔍 Recherche express de tarif</span>
+        </div>
+        <input type="text" id="laurentSearchInput" placeholder="Ex : batterie, phare de travail, 6005..." oninput="filterLaurentTarifs()">
+        <div id="laurentSearchResults" style="max-height:220px; overflow-y:auto;"></div>
+      </div>
+
+      <!-- 2. ESTIMATION CLIENT OR (RECTO + VERSO) -->
+      <div class="card">
+        <div class="card-title" style="color:#81c784;">
+          <span>🚜 Estimer un OR (Recto + Verso)</span>
+        </div>
+
+        <div class="row2">
+          <div class="scan-box laurent-border" style="padding:14px 8px;" onclick="document.getElementById('camLaurentRecto').click()">
+            <span style="font-size:1.6rem;">📷</span>
+            <strong style="font-size:0.85rem;">1. Photo Recto</strong>
+            <div id="statusLaurentRecto" style="font-size:0.72rem; color:var(--muted); margin-top:3px;">Travaux & heures</div>
+          </div>
+          <div class="scan-box laurent-border" style="padding:14px 8px;" onclick="document.getElementById('camLaurentVerso').click()">
+            <span style="font-size:1.6rem;">📷</span>
+            <strong style="font-size:0.85rem;">2. Photo Verso</strong>
+            <div id="statusLaurentVerso" style="font-size:0.72rem; color:var(--muted); margin-top:3px;">Liste des pièces</div>
+          </div>
+        </div>
+        <input type="file" id="camLaurentRecto" accept="image/*" capture="environment" onchange="handleLaurentRecto(this)">
+        <input type="file" id="camLaurentVerso" accept="image/*" capture="environment" onchange="handleLaurentVerso(this)">
+
+        <div id="loaderLaurentEst" class="loader" style="color:#81c784;">🪄 Analyse de la photo en cours...</div>
+
+        <div style="margin-top:10px;">
+          <div class="row2">
+            <div>
+              <label>Client</label>
+              <input type="text" id="lClient" placeholder="Nom du client">
+            </div>
+            <div>
+              <label>Date</label>
+              <input type="text" id="lDate" placeholder="JJ/MM/AAAA">
+            </div>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label>Engin / Matériel</label>
+              <input type="text" id="lEngin" placeholder="Tracteur / Machine">
+            </div>
+            <div>
+              <label>Heures Main-d'œuvre (<span id="lblTarifMO">--</span> €/h)</label>
+              <input type="number" id="lHeuresMO" step="0.25" value="0" oninput="recalcLaurentEstimation()">
+            </div>
+          </div>
+
+          <label class="checkbox-row" for="chkDeplacement">
+            <span>🚚 Forfait déplacement (<strong id="lblTarifDep">--</strong> €)</span>
+            <input type="checkbox" id="chkDeplacement" onchange="recalcLaurentEstimation()">
+          </label>
+
+          <label class="checkbox-row" for="chkFournitures">
+            <span>🧰 Forfait petites fournitures (<strong id="lblTarifFourn">--</strong> €)</span>
+            <input type="checkbox" id="chkFournitures" onchange="recalcLaurentEstimation()">
+          </label>
+
+          <div class="verso-section">
+            <div class="verso-line-header">
+              <strong style="color:#fff;">Pièces utilisées</strong>
+              <button type="button" class="btn btn-secondary btn-small" style="width:auto; margin:0;" onclick="addLaurentPieceLine()">+ Ajouter une pièce</button>
+            </div>
+            <div id="laurentEstPiecesContainer"></div>
+          </div>
+
+          <div class="total-banner">
+            <div class="lbl">Estimation totale à payer par le client</div>
+            <div class="amount" id="lTotalEstime">0,00 €</div>
+            <div class="sub">TVA non applicable (art. 293 B du CGI)</div>
+          </div>
+
+          <button class="btn btn-laurent" id="btnSendToCharlie" onclick="sendORToCharlie()">📤 Envoyer cet OR à Charlie pour facturation</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <nav id="bottomNav">
@@ -372,9 +585,14 @@
 
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbxJQLBw5f5v_1HlM5dC7bdPsBykRfbjPslnpLl3PfEFKp_9P7g1ZxnN3LRsT8WZpJvXjg/exec";
+  const URSSAF_RATE = 0.124; // 12,4 % (cotisations + formation)
+
   let currentUser = null;
   let pinBuffer = "";
   let currentArchivedORs = [];
+  let laurentCatalog = [];
+  let selectedSimPiece = null;
+  let laurentRectoCache = { heures_engin: "", texte_brut: "", texte_facture: "" };
   let deferredPrompt = null;
 
   if ("serviceWorker" in navigator) {
@@ -414,9 +632,7 @@
     document.getElementById("loginError").innerText = "";
     pinBuffer += digit;
     updatePinDots();
-    if (pinBuffer.length === 4) {
-      submitPin();
-    }
+    if (pinBuffer.length === 4) submitPin();
   }
 
   function backspacePin() {
@@ -460,9 +676,10 @@
       document.getElementById("nav-garage").style.display = "flex";
       nav.style.display = "flex";
       switchTab("or");
+    } else if (user.role === "LAURENT") {
+      nav.style.display = "none";
+      switchTab("laurent");
     } else {
-      document.getElementById("nav-or").style.display = "none";
-      document.getElementById("nav-pieces").style.display = "none";
       nav.style.display = "none";
       switchTab("garage");
     }
@@ -499,14 +716,17 @@
     el.style.height = (el.scrollHeight + 4) + "px";
   }
 
-  function copyField(fieldId, btn) {
-    const val = document.getElementById(fieldId).value;
-    navigator.clipboard.writeText(val).then(() => {
+  function copyTextDirect(text, btn) {
+    navigator.clipboard.writeText(text || "").then(() => {
       const original = btn.innerText;
       btn.innerText = "✅";
       btn.classList.add("copied");
       setTimeout(() => { btn.innerText = original; btn.classList.remove("copied"); }, 1000);
     });
+  }
+
+  function copyField(fieldId, btn) {
+    copyTextDirect(document.getElementById(fieldId).value, btn);
   }
 
   async function callApi(payload) {
@@ -528,8 +748,22 @@
     } catch (e) { console.error(e); }
   }
 
+  function getSpecialTarif(code) {
+    const target = code.trim().toUpperCase();
+    const found = laurentCatalog.find(p => p.id.trim().toUpperCase() === target);
+    return found ? Number(found.pv || 0) : 0;
+  }
+
   function updateUI(status) {
     if (!status || !currentUser) return;
+
+    if (status.laurentPieces && status.laurentPieces.length > 0) {
+      laurentCatalog = status.laurentPieces;
+      document.getElementById("lblTarifMO").innerText = getSpecialTarif("MO").toFixed(2);
+      document.getElementById("lblTarifDep").innerText = getSpecialTarif("Déplacement1").toFixed(2);
+      document.getElementById("lblTarifFourn").innerText = getSpecialTarif("FOURN").toFixed(2);
+      recalcLaurentEstimation();
+    }
 
     const alertL = document.getElementById("alertLaurent");
     if (currentUser.role === "ADMIN" && status.pendingLaurentCount > 0) {
@@ -540,7 +774,7 @@
     }
 
     const alertG = document.getElementById("alertGarage");
-    if (status.pendingGarageCount > 0) {
+    if ((currentUser.role === "ADMIN" || currentUser.role === "GARAGE") && status.pendingGarageCount > 0) {
       document.getElementById("pendingGarageCount").innerText = status.pendingGarageCount;
       alertG.style.display = "block";
     } else {
@@ -554,11 +788,20 @@
       if (currentArchivedORs.length > 0) {
         list.innerHTML = "";
         currentArchivedORs.forEach((or, index) => {
+          const isFromLaurent = or.statut === "ENVOYÉ PAR LAURENT";
+          const nbPieces = (or.pieces_verso || []).length;
           list.innerHTML += `
-            <div class="or-list-item">
+            <div class="or-list-item ${isFromLaurent ? 'from-laurent' : ''}">
               <div class="or-list-info" onclick="openArchivedOR(${index})">
-                <div class="top-line">${or.date ? or.date + " — " : ""}${or.client}</div>
-                <div class="sub-line">${or.engin || "Matériel non précisé"}${or.heures_mo ? " • " + or.heures_mo + "h MO" : ""}</div>
+                <div class="top-line">
+                  ${or.date ? or.date + " — " : ""}${or.client}
+                  ${isFromLaurent ? '<span class="badge-src">Envoyé par Laurent</span>' : ''}
+                </div>
+                <div class="sub-line">
+                  ${or.engin || "Matériel non précisé"}
+                  ${or.heures_mo ? " • " + or.heures_mo + "h MO" : ""}
+                  ${nbPieces > 0 ? " • " + nbPieces + " pièce(s)" : ""}
+                </div>
               </div>
               <button class="btn-del" onclick="removeArchivedOR(${or.row})">Effacer</button>
             </div>`;
@@ -607,7 +850,121 @@
     reader.readAsDataURL(file);
   }
 
-  // === FONCTIONS LAURENT ===
+  // === RECHERCHE APPROXIMATIVE DANS BASE_PIECES ===
+  function normalizeStr(s) {
+    return String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  }
+
+  function findCatalogMatches(refLue, desLue) {
+    const refN = normalizeStr(refLue);
+    const desN = normalizeStr(desLue);
+    if (!refN && !desN) return [];
+
+    // 1. Correspondance exacte sur la référence
+    if (refN) {
+      const exact = laurentCatalog.filter(p => normalizeStr(p.id) === refN);
+      if (exact.length > 0) return exact;
+    }
+
+    // 2. Correspondance partielle sur référence ou désignation
+    return laurentCatalog.filter(p => {
+      const pId = normalizeStr(p.id);
+      const pNom = normalizeStr(p.nom);
+      const matchRef = refN && refN.length >= 2 && (pId.includes(refN) || refN.includes(pId));
+      const matchDes = desN && desN.length >= 3 && pNom.includes(desN);
+      return matchRef || matchDes;
+    }).slice(0, 10);
+  }
+
+  // =========================================================
+  // FONCTIONS ADMIN : OR LAURENT (RECTO + VERSO)
+  // =========================================================
+  function renderAdminVersoLines(lines) {
+    const container = document.getElementById("adminVersoContainer");
+    container.innerHTML = "";
+    (lines || []).forEach(item => {
+      addAdminVersoLine(item);
+    });
+  }
+
+  function addAdminVersoLine(prefill = null) {
+    const container = document.getElementById("adminVersoContainer");
+    const refLue = prefill ? (prefill.id || prefill.ref_lue || "") : "";
+    const desLue = prefill ? (prefill.nom || prefill.designation_lue || "") : "";
+    const qte = prefill ? (prefill.qte || 1) : 1;
+
+    const matches = findCatalogMatches(refLue, desLue);
+    const best = matches.length > 0 ? matches[0] : null;
+    const finalId = prefill && prefill.id ? prefill.id : (best ? best.id : refLue);
+    const finalNom = prefill && prefill.nom ? prefill.nom : (best ? best.nom : desLue);
+    const finalPv = prefill && prefill.pv !== undefined ? Number(prefill.pv) : (best ? best.pv : 0);
+    const isMatched = Boolean(best || (prefill && prefill.matched));
+
+    let selectHtml = "";
+    if (matches.length > 1) {
+      const opts = matches.map((m, idx) =>
+        `<option value="${idx}">${m.id} — ${m.nom} (${m.pv.toFixed(2)} €)</option>`
+      ).join("");
+      selectHtml = `
+        <select style="margin-bottom:6px; font-size:0.82rem; padding:6px;" onchange="applyAdminVersoMatch(this)">
+          ${opts}
+        </select>`;
+    }
+
+    const div = document.createElement("div");
+    div.className = `piece-item ${isMatched ? 'matched-item' : 'unmatched-item'}`;
+    div.dataset.matches = JSON.stringify(matches);
+    div.innerHTML = `
+      <div class="verso-line-header">
+        <span>${isMatched ? '✅ Trouvé dans Base_Pièces' : '⚠️ Note manuscrite (hors base)'}</span>
+        <button type="button" class="btn-remove-line" onclick="this.closest('.piece-item').remove()">✕</button>
+      </div>
+      ${selectHtml}
+      <div class="copy-group" style="margin-bottom:6px;">
+        <input type="text" class="av-id" value="${finalId.replace(/"/g, '&quot;')}" placeholder="Réf. Pennylane">
+        <button type="button" class="btn-copy-cell" onclick="copyTextDirect(this.previousElementSibling.value, this)">📋</button>
+      </div>
+      <div class="copy-group" style="margin-bottom:6px;">
+        <input type="text" class="av-nom" value="${finalNom.replace(/"/g, '&quot;')}" placeholder="Désignation">
+        <button type="button" class="btn-copy-cell" onclick="copyTextDirect(this.previousElementSibling.value, this)">📋</button>
+      </div>
+      <div class="row2">
+        <div class="copy-group">
+          <input type="number" step="0.1" class="av-qte" value="${qte}" placeholder="Qté">
+          <button type="button" class="btn-copy-cell" onclick="copyTextDirect(this.previousElementSibling.value, this)">📋</button>
+        </div>
+        <div>
+          <input type="number" step="0.01" class="av-pv" value="${finalPv.toFixed(2)}" placeholder="PV €">
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  }
+
+  function applyAdminVersoMatch(selectEl) {
+    const item = selectEl.closest(".piece-item");
+    const matches = JSON.parse(item.dataset.matches || "[]");
+    const chosen = matches[Number(selectEl.value)];
+    if (!chosen) return;
+    item.querySelector(".av-id").value = chosen.id;
+    item.querySelector(".av-nom").value = chosen.nom;
+    item.querySelector(".av-pv").value = chosen.pv.toFixed(2);
+  }
+
+  function collectAdminVersoLines() {
+    const list = [];
+    document.querySelectorAll("#adminVersoContainer .piece-item").forEach(div => {
+      list.push({
+        id: div.querySelector(".av-id").value.trim(),
+        nom: div.querySelector(".av-nom").value.trim(),
+        qte: parseFloat(div.querySelector(".av-qte").value) || 1,
+        pv: parseFloat(div.querySelector(".av-pv").value) || 0,
+        matched: div.classList.contains("matched-item")
+      });
+    });
+    return list;
+  }
+
   function openArchivedOR(index) {
     const or = currentArchivedORs[index];
     if (!or) return;
@@ -619,6 +976,7 @@
     const txtEl = document.getElementById("orTextePropre");
     txtEl.value = or.texte_facture || "";
     document.getElementById("orTexteBrut").value = or.texte_brut || "";
+    renderAdminVersoLines(or.pieces_verso || []);
     document.getElementById("btnSaveOR").style.display = "none";
     document.getElementById("resultOR").style.display = "block";
     autoResizeTextarea(txtEl);
@@ -649,11 +1007,25 @@
         const txtEl = document.getElementById("orTextePropre");
         txtEl.value = res.texte_facture || "";
         document.getElementById("orTexteBrut").value = res.texte_brut || "";
+        document.getElementById("adminVersoContainer").innerHTML = "";
         document.getElementById("btnSaveOR").style.display = "block";
         document.getElementById("resultOR").style.display = "block";
         autoResizeTextarea(txtEl);
       } catch (err) { alert("Erreur : " + err.message); }
       finally { document.getElementById("loaderOR").style.display = "none"; input.value = ""; }
+    });
+  }
+
+  function handleAdminVersoFile(input) {
+    if (!input.files[0]) return;
+    document.getElementById("loaderORVerso").style.display = "block";
+
+    prepareFile(input.files[0], async (b64, mime) => {
+      try {
+        const res = await callApi({ action: "analyzeORVerso", base64: b64, mimeType: mime });
+        renderAdminVersoLines(res.pieces || []);
+      } catch (err) { alert("Erreur : " + err.message); }
+      finally { document.getElementById("loaderORVerso").style.display = "none"; input.value = ""; }
     });
   }
 
@@ -664,13 +1036,14 @@
       document.getElementById("orDate").value ? "- Intervention du " + document.getElementById("orDate").value : ""
     ].filter(Boolean).join(" ");
     const fullText = (header ? header + "\n" : "") + document.getElementById("orTextePropre").value;
-    navigator.clipboard.writeText(fullText).then(() => alert("✅ Bloc complet copié !"));
+    navigator.clipboard.writeText(fullText).then(() => alert("✅ Bloc travaux copié !"));
   }
 
   async function saveORToSheet() {
     try {
       const res = await callApi({
         action: "saveOR",
+        role: "ADMIN",
         data: {
           date_travaux: document.getElementById("orDate").value,
           client: document.getElementById("orClient").value,
@@ -678,12 +1051,83 @@
           heures_engin: document.getElementById("orHeuresEngin").value,
           heures_mo: document.getElementById("orHeuresMO").value,
           texte_facture: document.getElementById("orTextePropre").value,
-          texte_brut: document.getElementById("orTexteBrut").value
+          texte_brut: document.getElementById("orTexteBrut").value,
+          pieces_verso: collectAdminVersoLines()
         }
       });
       updateUI(res.status);
-      alert("💾 OR archivé !");
+      alert("💾 OR et pièces archivés !");
     } catch (err) { alert("Erreur : " + err.message); }
+  }
+
+  // =========================================================
+  // FONCTIONS ADMIN : PIECES LAURENT + SIMULATEUR REVIENT
+  // =========================================================
+  function toggleCostSimulator() {
+    const body = document.getElementById("costSimulatorBody");
+    const icon = document.getElementById("simToggleIcon");
+    const isHidden = body.style.display === "none";
+    body.style.display = isHidden ? "block" : "none";
+    icon.innerText = isHidden ? "▲ Fermer" : "▼ Ouvrir";
+  }
+
+  function filterSimPieces() {
+    const q = normalizeStr(document.getElementById("simSearchInput").value);
+    const box = document.getElementById("simSearchResults");
+    box.innerHTML = "";
+    if (q.length < 2) return;
+
+    const matches = laurentCatalog.filter(p =>
+      normalizeStr(p.id).includes(q) || normalizeStr(p.nom).includes(q)
+    ).slice(0, 15);
+
+    matches.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "search-result-item";
+      div.style.cursor = "pointer";
+      div.innerHTML = `
+        <div>
+          <div class="ref">${p.id}</div>
+          <div class="name">${p.nom}</div>
+        </div>
+        <div class="price">${p.pv.toFixed(2)} €</div>
+      `;
+      div.onclick = () => selectSimPiece(p);
+      box.appendChild(div);
+    });
+  }
+
+  function selectSimPiece(piece) {
+    selectedSimPiece = piece;
+    document.getElementById("simSearchResults").innerHTML = "";
+    document.getElementById("simSearchInput").value = piece.nom;
+    document.getElementById("simSelectedName").innerText = piece.nom;
+    document.getElementById("simSelectedRef").innerText = "Réf : " + piece.id + (piece.fournisseur ? " (" + piece.fournisseur + ")" : "");
+    document.getElementById("simRemiseInput").value = 0;
+    document.getElementById("simCalcPanel").style.display = "block";
+    recalcCostSimulator();
+  }
+
+  function recalcCostSimulator() {
+    if (!selectedSimPiece) return;
+    const pa = Number(selectedSimPiece.pa_ht || 0);
+    const pvCat = Number(selectedSimPiece.pv || 0);
+    const remisePct = Math.max(0, Math.min(100, parseFloat(document.getElementById("simRemiseInput").value) || 0));
+
+    const pvRemise = Math.round(pvCat * (1 - remisePct / 100) * 100) / 100;
+    const urssaf = Math.round(pvRemise * URSSAF_RATE * 100) / 100;
+    const revient = Math.round((pa + urssaf) * 100) / 100;
+    const marge = Math.round((pvRemise - revient) * 100) / 100;
+
+    document.getElementById("simPA").innerText = pa.toFixed(2) + " €";
+    document.getElementById("simPVCat").innerText = pvCat.toFixed(2) + " €";
+    document.getElementById("simPVNet").innerText = pvRemise.toFixed(2) + " €";
+    document.getElementById("simUrssaf").innerText = urssaf.toFixed(2) + " €";
+    document.getElementById("simRevient").innerText = revient.toFixed(2) + " €";
+
+    const margeRow = document.getElementById("simMargeRow");
+    margeRow.className = "sim-row " + (marge >= 0 ? "marge-ok" : "marge-bad");
+    document.getElementById("simMarge").innerText = (marge >= 0 ? "+" : "") + marge.toFixed(2) + " €";
   }
 
   function handlePiecesFile(input) {
@@ -749,7 +1193,227 @@
     finally { btn.disabled = false; btn.innerText = "📥 Générer Excel Pennylane"; }
   }
 
-  // === FONCTIONS GARAGE MATEO (EBP) ===
+  // =========================================================
+  // FONCTIONS ESPACE LAURENT (RECHERCHE PRIX + ESTIMATION OR)
+  // =========================================================
+  function filterLaurentTarifs() {
+    const q = normalizeStr(document.getElementById("laurentSearchInput").value);
+    const box = document.getElementById("laurentSearchResults");
+    box.innerHTML = "";
+    if (q.length < 2) return;
+
+    const matches = laurentCatalog.filter(p =>
+      normalizeStr(p.id).includes(q) || normalizeStr(p.nom).includes(q)
+    ).slice(0, 20);
+
+    if (matches.length === 0) {
+      box.innerHTML = `<div style="font-size:0.82rem; color:var(--muted); padding:8px;">Aucune pièce trouvée.</div>`;
+      return;
+    }
+
+    matches.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "search-result-item";
+      div.innerHTML = `
+        <div style="flex:1; min-width:0;">
+          <div class="ref">${p.id}</div>
+          <div class="name">${p.nom}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="price">${p.pv.toFixed(2)} €</div>
+          <button type="button" class="btn btn-secondary" style="padding:3px 8px; font-size:0.72rem; margin-top:4px; width:auto;" onclick='addLaurentPieceLine(${JSON.stringify({ id: p.id, nom: p.nom, pv: p.pv, qte: 1, matched: true })})'>+ OR</button>
+        </div>
+      `;
+      box.appendChild(div);
+    });
+  }
+
+  function handleLaurentRecto(input) {
+    if (!input.files[0]) return;
+    document.getElementById("loaderLaurentEst").style.display = "block";
+
+    prepareFile(input.files[0], async (b64, mime) => {
+      try {
+        const res = await callApi({ action: "analyzeOR", base64: b64, mimeType: mime });
+        document.getElementById("lDate").value = res.date_travaux || "";
+        document.getElementById("lClient").value = res.client || "";
+        document.getElementById("lEngin").value = res.engin || "";
+        document.getElementById("lHeuresMO").value = parseFloat(res.heures_mo) || 0;
+        laurentRectoCache = {
+          heures_engin: res.heures_engin || "",
+          texte_brut: res.texte_brut || "",
+          texte_facture: res.texte_facture || ""
+        };
+        document.getElementById("statusLaurentRecto").innerText = "✅ Recto lu (" + (res.heures_mo || 0) + "h MO)";
+        document.getElementById("statusLaurentRecto").style.color = "#81c784";
+        recalcLaurentEstimation();
+      } catch (err) { alert("Erreur : " + err.message); }
+      finally { document.getElementById("loaderLaurentEst").style.display = "none"; input.value = ""; }
+    });
+  }
+
+  function handleLaurentVerso(input) {
+    if (!input.files[0]) return;
+    document.getElementById("loaderLaurentEst").style.display = "block";
+
+    prepareFile(input.files[0], async (b64, mime) => {
+      try {
+        const res = await callApi({ action: "analyzeORVerso", base64: b64, mimeType: mime });
+        const container = document.getElementById("laurentEstPiecesContainer");
+        container.innerHTML = "";
+        (res.pieces || []).forEach(p => addLaurentPieceLine(p));
+        document.getElementById("statusLaurentVerso").innerText = "✅ " + (res.pieces || []).length + " pièce(s) lue(s)";
+        document.getElementById("statusLaurentVerso").style.color = "#81c784";
+        recalcLaurentEstimation();
+      } catch (err) { alert("Erreur : " + err.message); }
+      finally { document.getElementById("loaderLaurentEst").style.display = "none"; input.value = ""; }
+    });
+  }
+
+  function addLaurentPieceLine(prefill = null) {
+    const container = document.getElementById("laurentEstPiecesContainer");
+    const refLue = prefill ? (prefill.id || prefill.ref_lue || "") : "";
+    const desLue = prefill ? (prefill.nom || prefill.designation_lue || "") : "";
+    const qte = prefill ? (prefill.qte || 1) : 1;
+
+    const matches = prefill && prefill.matched ? [] : findCatalogMatches(refLue, desLue);
+    const best = matches.length > 0 ? matches[0] : null;
+    const finalId = prefill && prefill.id ? prefill.id : (best ? best.id : refLue);
+    const finalNom = prefill && prefill.nom ? prefill.nom : (best ? best.nom : desLue);
+    const finalPv = prefill && prefill.pv !== undefined ? Number(prefill.pv) : (best ? best.pv : 0);
+    const isMatched = Boolean(best || (prefill && prefill.matched));
+
+    let selectHtml = "";
+    if (matches.length > 1) {
+      const opts = matches.map((m, idx) =>
+        `<option value="${idx}">${m.id} — ${m.nom} (${m.pv.toFixed(2)} €)</option>`
+      ).join("");
+      selectHtml = `
+        <select style="margin-bottom:6px; font-size:0.82rem; padding:6px;" onchange="applyLaurentEstMatch(this)">
+          ${opts}
+        </select>`;
+    }
+
+    const div = document.createElement("div");
+    div.className = `piece-item ${isMatched ? 'matched-item' : 'unmatched-item'}`;
+    div.dataset.matches = JSON.stringify(matches);
+    div.innerHTML = `
+      <div class="verso-line-header">
+        <span>${isMatched ? '✅ Tarif base trouvé' : '⚠️ Prix inconnu (à saisir si besoin)'}</span>
+        <button type="button" class="btn-remove-line" onclick="this.closest('.piece-item').remove(); recalcLaurentEstimation();">✕</button>
+      </div>
+      ${selectHtml}
+      <div class="piece-grid" style="margin-top:0; margin-bottom:6px;">
+        <input type="text" class="le-id" value="${finalId.replace(/"/g, '&quot;')}" placeholder="Réf.">
+        <input type="text" class="le-nom" value="${finalNom.replace(/"/g, '&quot;')}" placeholder="Désignation">
+      </div>
+      <div class="row2">
+        <div>
+          <label style="margin:0 0 2px;">Quantité</label>
+          <input type="number" step="0.1" class="le-qte" value="${qte}" oninput="recalcLaurentEstimation()">
+        </div>
+        <div>
+          <label style="margin:0 0 2px;">Prix unitaire (€)</label>
+          <input type="number" step="0.01" class="le-pv" value="${finalPv.toFixed(2)}" oninput="recalcLaurentEstimation()">
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+    recalcLaurentEstimation();
+  }
+
+  function applyLaurentEstMatch(selectEl) {
+    const item = selectEl.closest(".piece-item");
+    const matches = JSON.parse(item.dataset.matches || "[]");
+    const chosen = matches[Number(selectEl.value)];
+    if (!chosen) return;
+    item.querySelector(".le-id").value = chosen.id;
+    item.querySelector(".le-nom").value = chosen.nom;
+    item.querySelector(".le-pv").value = chosen.pv.toFixed(2);
+    recalcLaurentEstimation();
+  }
+
+  function recalcLaurentEstimation() {
+    const tarifMO = getSpecialTarif("MO");
+    const tarifDep = getSpecialTarif("Déplacement1");
+    const tarifFourn = getSpecialTarif("FOURN");
+
+    const heuresMO = parseFloat(document.getElementById("lHeuresMO").value) || 0;
+    let total = heuresMO * tarifMO;
+
+    if (document.getElementById("chkDeplacement").checked) total += tarifDep;
+    if (document.getElementById("chkFournitures").checked) total += tarifFourn;
+
+    document.querySelectorAll("#laurentEstPiecesContainer .piece-item").forEach(div => {
+      const qte = parseFloat(div.querySelector(".le-qte").value) || 0;
+      const pv = parseFloat(div.querySelector(".le-pv").value) || 0;
+      total += qte * pv;
+    });
+
+    document.getElementById("lTotalEstime").innerText = total.toFixed(2).replace(".", ",") + " €";
+  }
+
+  async function sendORToCharlie() {
+    const btn = document.getElementById("btnSendToCharlie");
+    btn.disabled = true;
+    btn.innerText = "⏳ Envoi en cours à Charlie...";
+
+    const pieces = [];
+    document.querySelectorAll("#laurentEstPiecesContainer .piece-item").forEach(div => {
+      pieces.push({
+        id: div.querySelector(".le-id").value.trim(),
+        nom: div.querySelector(".le-nom").value.trim(),
+        qte: parseFloat(div.querySelector(".le-qte").value) || 1,
+        pv: parseFloat(div.querySelector(".le-pv").value) || 0,
+        matched: div.classList.contains("matched-item")
+      });
+    });
+
+    if (document.getElementById("chkDeplacement").checked) {
+      pieces.push({ id: "Déplacement1", nom: "Forfait déplacement", qte: 1, pv: getSpecialTarif("Déplacement1"), matched: true });
+    }
+    if (document.getElementById("chkFournitures").checked) {
+      pieces.push({ id: "FOURN", nom: "Forfait petites fournitures", qte: 1, pv: getSpecialTarif("FOURN"), matched: true });
+    }
+
+    try {
+      await callApi({
+        action: "saveOR",
+        role: "LAURENT",
+        data: {
+          date_travaux: document.getElementById("lDate").value,
+          client: document.getElementById("lClient").value,
+          engin: document.getElementById("lEngin").value,
+          heures_engin: laurentRectoCache.heures_engin || "",
+          heures_mo: document.getElementById("lHeuresMO").value,
+          texte_facture: laurentRectoCache.texte_facture || "",
+          texte_brut: laurentRectoCache.texte_brut || "",
+          pieces_verso: pieces
+        }
+      });
+      alert("✅ OR envoyé à Charlie pour facturation !");
+      document.getElementById("laurentEstPiecesContainer").innerHTML = "";
+      document.getElementById("lClient").value = "";
+      document.getElementById("lEngin").value = "";
+      document.getElementById("lHeuresMO").value = 0;
+      document.getElementById("chkDeplacement").checked = false;
+      document.getElementById("chkFournitures").checked = false;
+      document.getElementById("statusLaurentRecto").innerText = "Travaux & heures";
+      document.getElementById("statusLaurentRecto").style.color = "var(--muted)";
+      document.getElementById("statusLaurentVerso").innerText = "Liste des pièces";
+      document.getElementById("statusLaurentVerso").style.color = "var(--muted)";
+      recalcLaurentEstimation();
+    } catch (err) {
+      alert("Erreur : " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "📤 Envoyer cet OR à Charlie pour facturation";
+    }
+  }
+
+  // =========================================================
+  // FONCTIONS GARAGE MATEO (EBP)
+  // =========================================================
   function updateGarageRow(inputEl) {
     const item = inputEl.closest(".piece-item");
     const brut = parseFloat(item.querySelector(".g-brut").value) || 0;
